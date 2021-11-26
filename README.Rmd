@@ -1,5 +1,5 @@
 ---
-title: "GH repository for ``On model-based time trend adjustments in platform trials with non-concurrent controls''"
+title: "Model-based time trend adjustments in platform trials with non-concurrent controls"
 output: github_document
 ---
 
@@ -8,9 +8,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-We investigated frequentist, model-based approaches to adjust for time trends in platform trials utilizing non-concurrent controls. We investigated conditions under which the model-based approaches can successfully adjust for time trends for the simple case of a two-period trial with two experimental treatments and a shared control.
+This repository contains the main code and R functions to reproduce the results of the simulation study in ``On model-based time trend adjustments in platform trials with non-concurrent controls'' (XXX).
 
-This repository contains the main code and R functions to reproduce the results of the simulation study in XXX.
+We investigated frequentist, model-based approaches to adjust for time trends in platform trials utilizing non-concurrent controls. We investigated conditions under which the model-based approaches can successfully adjust for time trends for the simple case of a two-period trial with two experimental treatments and a shared control.
 
 Outline structure repository.
 
