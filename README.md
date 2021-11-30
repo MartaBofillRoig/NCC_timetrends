@@ -198,6 +198,21 @@ Figures presented in the main paper have the suffix **\_main**
 supplementary material are indicated by the suffix **\_supp**
 (e.g. **cont\_all\_eq\_bias\_supp.png**).
 
+-----
+
+**Funding**
+
+[EU-PEARL](https://eu-pearl.eu/) (EU Patient-cEntric clinicAl tRial
+pLatforms) project has received funding from the Innovative Medicines
+Initiative (IMI) 2 Joint Undertaking (JU) under grant agreement No
+853966. This Joint Undertaking receives support from the European
+Union’s Horizon 2020 research and innovation programme and EFPIA
+andChildren’s Tumor Foundation, Global Alliance for TB Drug Development
+non-profit organisation, Spring works Therapeutics Inc. This publication
+reflects the authors’ views. Neither IMI nor the European Union, EFPIA,
+or any Associated Partners are responsible for any use that may be made
+of the information contained herein.
+
 <!-- ## Example?? -->
 
 <!-- This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated. -->
