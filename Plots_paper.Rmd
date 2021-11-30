@@ -22,16 +22,16 @@ library(RColorBrewer)
 library(ggsci)
 library(scales)
 
-source("linear_model.R")
-source("log_model.R")
-source("z_test.R")
-source("t_test.R")
-source("z_prop_test.R")
-source("trend_functions.R")
-source("data_sim_block.R")
-source("allinone_model.R")
-source("allinone_sim.R")
-source("allinone_sim_par.R")
+source("functions/linear_model.R")
+source("functions/log_model.R")
+source("functions/z_test.R")
+source("functions/t_test.R")
+source("functions/z_prop_test.R")
+source("functions/trend_functions.R")
+source("functions/data_sim_block.R")
+source("functions/allinone_model.R")
+source("functions/allinone_sim.R")
+source("functions/allinone_sim_par.R")
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -1109,7 +1109,7 @@ response_cont <- results_cont_eq_inv %>%
   filter(lambda1==0.15)
 
 for (i in 1:nrow(response_cont)) {
-  data_ <- data_sim_block(K=response_cont$K[i],mu0=response_cont$mu0[i],
+  data_ <- data_sim_block(K=response_cont$K[i], mu0=response_cont$mu0[i],
                           delta=c(response_cont$delta1[i],response_cont$delta2[i]),
                           lambda=c(response_cont$lambda0[i],response_cont$lambda1[i],response_cont$lambda2[i]),
                           sigma=response_cont$sigma[i],
