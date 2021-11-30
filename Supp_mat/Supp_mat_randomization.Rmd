@@ -1,0 +1,240 @@
+---
+title: "Randomization and non-concurrent controls"
+author: "M. Bofill Roig and M. Posch"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette :
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(gridExtra)
+
+source("linear_model.R") #script model-based approaches  
+source("log_model.R") #script model-based approaches  
+source("trend_functions.R") #script time trends
+source("data_sim.R") #script data generation randomization procedure I
+source("data_sim_rdt.R") #script data generation randomization procedure II
+source("data_sim_order.R") #script data generation randomization procedure III
+source("data_sim_block.R") #script data generation randomization procedure IV
+source("data_sim_brdt.R") #script data generation randomization procedure V
+```
+
+```{r}
+set.seed(3214)
+```
+
+
+# Continuous endpoints
+
+```{r}
+alpha=0.025
+delta=c(0.25,0)
+OR=c(1.8,1)
+#nsim=100
+nsim=100000
+```
+
+## Randomization sequence per period
+
+### Deterministic times 
+
+```{r}
+# Extreme time trend
+
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim(K=1, mu0=0, delta=c(0.25,0), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim(K=1, mu0=0, delta=c(0.25,0), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+
+### Random times
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim_rdt(K=1, mu0=0, delta=c(0.25,0), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim_rdt(K=1, mu0=0, delta=c(0.25,0), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+
+## Block randomization
+
+### Deterministic times 
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim_block(K=1, mu0=0, delta=c(0.25,0), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim_block(K=1, mu0=0, delta=c(0.25,0), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+### Random times
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim_brdt(K=1, mu0=0, delta=c(0.25,0), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               linear_model_a2(data=data_sim_brdt(K=1, mu0=0, delta=c(0.25,0), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", endpoint="continuous"),
+                               delta=delta, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+
+# Binary endpoints
+
+## Randomization sequence per period
+
+### Deterministic times 
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+### Random times
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim_rdt(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim_rdt(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+## Block randomization
+
+### Deterministic times
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim_block(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim_block(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+### Random times
+
+```{r}
+# Extreme time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim_brdt(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(5,5,5), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+```{r}
+# Moderate time trend
+x <- replicate(nsim,
+               logistic_model_a2(data=data_sim_brdt(K=1, p0 = 0.3, OR=c(1.8,1), lambda=c(.15,.15,.15), sigma=1, N1=c(125,125), N2=c(125,125), N_add=250, trend="linear2", trend_param = "mult", endpoint="binary"),
+                               OR=OR, alpha=alpha)[3])
+sum(as.numeric(x))/nsim
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
