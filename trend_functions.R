@@ -1,0 +1,24 @@
+# TREND FUNCTIONS FOR NON-CONCURRENT CONTROL DATA
+# 
+#' We define the trend functions:
+#' 
+#' - no-trend
+#' - linear trend
+#' - stepwise trend
+#' 
+## ----------------------------------------------------------------------------------------------------------------------
+# no-trend
+notrend <- function(j){0}
+# linear trend
+linear_trend <- function(j,lambda,sample_size){lambda*(j-1)/(sample_size-1)}
+# linear trend only second period
+# sample size: vector of dim 2, with sample size per periods
+linear_trend2 <- function(j,lambda,sample_size){ifelse(j<=sample_size[1],0,lambda*(j-1)/(sum(sample_size)-1))}
+# stepwise trend
+sw_trend <- function(cj,lambda){lambda*cj}
+
+
+
+
+# j=1;lambda=3;sample_size=100
+# ifelse(j>10,lambda*(j-1)/(sample_size-1),-10)
