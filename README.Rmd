@@ -15,7 +15,7 @@ We investigated frequentist, model-based approaches to adjust for time trends in
 
 ![Image Title](./figures/trial_scheme.png){width=30%}
 
-Outline structure repository.
+Next, we explain the R functions we created to simulate the data and to analyse it. After this, we describe the main simulation script and results and briefly summarize the supplementary material and the figures created.
 
 # R Functions
 
