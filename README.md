@@ -63,27 +63,27 @@ Running this script results in 100 separate .csv files, named **results\_bin\_tr
 
     -   for **trendpattern**, we considered the options:
 
-    -   **inv\_1** - inverted-U trend with peak in the middle of period 1
-    -   **inv\_2** - inverted-U trend with peak between period 1 and 2
-    -   **inv\_3** - inverted-U trend with peak in the middle of period 2
-    -   **lin** - linear trend
-    -   **step** - stepwise trend
+        -   **inv\_1** - inverted-U trend with peak in the middle of period 1
+        -   **inv\_2** - inverted-U trend with peak between period 1 and 2
+        -   **inv\_3** - inverted-U trend with peak in the middle of period 2
+        -   **lin** - linear trend
+        -   **step** - stepwise trend
 
     -   for **parametrization**, we considered:
 
-    -   **add** - additive parametrization
-    -   **mult** - multiplicative parametrization
+        -   **add** - additive parametrization
+        -   **mult** - multiplicative parametrization
 
     -   for **hypothesis**, we considered:
 
-    -   **alpha** - simulations of the type I error under the null hypothesis
-    -   **pow** - simulations of the power under the alternative hypothesis
+        -   **alpha** - simulations of the type I error under the null hypothesis
+        -   **pow** - simulations of the power under the alternative hypothesis
 
     -   for **trendtype**, we considered:
 
-    -   **eq** - equal time trend in all arms
-    -   **diff\_pos** - positive time trend in control and arm 2, varying trend in arm 1
-    -   **diff\_neg** - negative time trend in control and arm 2, varying trend in arm 1
+        -   **eq** - equal time trend in all arms
+        -   **diff\_pos** - positive time trend in control and arm 2, varying trend in arm 1
+        -   **diff\_neg** - negative time trend in control and arm 2, varying trend in arm 1
 
     -   additionally, **OR1** refers to scenarios with OR1&gt;1, otherwise OR1&lt;1 is used
 
