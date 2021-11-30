@@ -17,9 +17,46 @@ We investigated frequentist, model-based approaches to adjust for time trends in
 
 Outline structure repository.
 
+# R Functions
+
+The folder _functions_ contains all R functions necessary to reproduce the results and figures in the main paper and supplementary material:
+
+## Functions for data generation
+
+- **trend_functions.R**: Contains functions ``linear_trend()`` and ``sw_trend()`` that are used to generate linear or stepwise trend in the main paper and the function ``linear_trend2()`` that is used to simulate linear trend that starts in the second period in the supplementary material.
+
+- **data_sim_block.R**: The function ``data_sim_block()`` simulates continuous or binary data for two-stage platform trial using block randomization and deterministic patient entry times, based on given sample sizes, effect sizes and time trend specifications. This function is used for data generation in the main paper.
+
+- **data_sim_brdt.R**: The function ``data_sim_brdt()`` simulates continuous or binary data for two-stage platform trial using block randomization and random patient entry times.
+
+- **data_sim.R**: The function ``data_sim()`` simulates continuous or binary data for two-stage platform trial using simple randomization per period and deterministic patient entry times.
+
+- **data_sim_rdt.R**: The function ``data_sim_rdt()`` simulates continuous or binary data for two-stage platform trial using simple randomization per period and random patient entry times.
+
+## Functions for tests and models
+
+- **z_test.R**: Contains functions ``z_test_pol()`` and ``z_test_sep()`` that perform pooled or separate one-sided z-test with the given data.
+
+- **t_test.R**: Contains functions ``t_test_pol()`` and ``t_test_sep()`` that perform pooled or separate one-sided t-test with the given data.
+
+- **linear_model.R**: Contains functions ``linear_model_a1()``, ``linear_model_a1_int()``, ``linear_model_a2()``, ``linear_model_a2_int()``, ``linear_model_b1()`` and ``linear_model_b2()`` that are used to fit different linear regression models (ALLTC-Linear, ALLTCI-Linear, ALLTC-Step, ALLTCI-Step, TC-Linear and TC-Step) to given data.
+
+- **z_prop_test.R**: Contains function ``z_prop_pol()`` and ``z_prop_sep()`` that perform pooled or separate one-sided two-proportions z-test for with the given data.
+
+- **log_model.R**: Contains functions ``logistic_model_a1()``, ``logistic_model_a1_int()``, ``logistic_model_a2()``, ``logistic_model_a2_int()``, ``logistic_model_b1()``, ``logistic_model_b2()``, ``logistic_model_sep()`` and ``logistic_model_pol()`` that are used to fit different logistic regression models (ALLTC-Linear, ALLTCI-Linear, ALLTC-Step, ALLTCI-Step, TC-Linear, TC-Step and separate and pooled logistic model) to given data.
+
+## Functions for simulations
+
+- **allinone_model.R**: The function ``allinone_model()`` is programmed to call all the aforementioned functions and return the calculated metrics (T/F for reject $H_{02}$ and bias) from all considered tests and models.
+
+- **allinone_sim.R**: The function ``allinone_simsce()`` takes a data frame with different simulation scenarios as input and performs _nsim_ replications for each of them to simulate the type I error rate/power, bias and rMSE.
+
+- **allinone_sim_par.R**: The function ``allinone_simsce_par()`` is a parallelized version of ``allinone_simsce()``.
+
+
 # Main paper
 
-## Main simulation script and results:
+## Main simulation script and results
 
 - **mainpaper_script.R**: Script with all scenarios considered in the study. Simulates given scenarios and saves the results as .csv files in the folder _results_. 
 
@@ -52,7 +89,7 @@ Running this script results in 100 separate .csv files, named **results_bin_tren
       - **diff_pos** - positive time trend in control and arm 2, varying trend in arm 1
       - **diff_neg** - negative time trend in control and arm 2, varying trend in arm 1
 
-    - additionally, **OR1** refers to scenarios with OR1>1, otherwise OR1<1 is used
+    - additionally, **OR1** refers to scenarios with $OR_1>1$, otherwise $OR_1<1$ is used
 
 
 
@@ -78,39 +115,16 @@ Running this script results in 100 separate .csv files, named **results_bin_tren
 
 
 
-## R Functions: 
-
-- **trend_functions.R**: Contains functions ``linear_trend()`` and ``sw_trend()`` that are used to generate linear or stepwise trend.
-- **data_sim_block.R**: The function ``data_sim_block()`` is used to simulate continuous or binary data for two-stage platform trial using block randomization, based on given sample sizes, effect sizes and time trend specifications.
-- **z_test.R**: Contains functions ``z_test_pol()`` and ``z_test_sep()`` that perform pooled or separate one-sided z-test with the given data.
-- **t_test.R**: Contains functions ``t_test_pol()`` and ``t_test_sep()`` that perform pooled or separate one-sided t-test with the given data.
-- **linear_model.R**: Contains functions ``linear_model_a1()``, ``linear_model_a1_int()``, ``linear_model_a2()``, ``linear_model_a2_int()``, ``linear_model_b1()`` and ``linear_model_b2()`` that are used to fit different linear regression models (ALLTC-Linear, ALLTCI-Linear, ALLTC-Step, ALLTCI-Step, TC-Linear and TC-Step) to given data.
-- **z_prop_test.R**: Contains function ``z_prop_pol()`` and ``z_prop_sep()`` that perform pooled or separate one-sided two-proportions z-test for with the given data.
-- **log_model.R**: Contains functions ``logistic_model_a1()``, ``logistic_model_a1_int()``, ``logistic_model_a2()``, ``logistic_model_a2_int()``, ``logistic_model_b1()``, ``logistic_model_b2()``, ``logistic_model_sep()`` and ``logistic_model_pol()`` that are used to fit different logistic regression models (ALLTC-Linear, ALLTCI-Linear, ALLTC-Step, ALLTCI-Step, TC-Linear, TC-Step and separate and pooled logistic model) to given data.
-- **allinone_model.R**: The function ``allinone_model()`` is programmed to call all the aforementioned functions and return the calculated metrics (T/F for reject $H_{02}$ and bias) from all considered tests and models.
-- **allinone_sim.R**: The function ``allinone_simsce()`` takes a data frame with different simulation scenarios as input and performs _nsim_ replications for each of them to simulate the type I error rate/power, bias and rMSE. 
-- **allinone_sim_par.R**: The function ``allinone_simsce_par()`` is a parallelized version of ``allinone_simsce()``
-
-## Plots:
-
-- **Plots_paper.Rmd**: generates all figures used in the paper and saves them in the folder _figures_.
 
 # Supplementary material 
 
 The folder _Supp\_mat_ contains additional results regarding different randomization procedures discussed in the Supplementary material. Results that are reported in Section 3 of the Supplementary material are simulated in the ``Supp_mat_randomization.Rmd`` script and presented in the corresponding HTML file.
 
-## R Functions:
+# Figures
 
-- **trend_functions.R**: Contains function ``linear_trend2()`` that is used to generate time trend that starts in the second period and is linear (no trend is present in the first period).
-- **linear_model.R**: Contains function ``linear_model_a2()`` that is used to fit the *ALLTC-Step* linear regression model to given data.
-- **log_model.R**: Contains function ``logistic_model_a2()`` that is used to fit *ALLTC-Step* logistic regression model to given data.
-- **data_sim.R**: The function ``data_sim()`` simulates continuous or binary data for two-stage platform trial using simple randomization per period and deterministic patient entry times.
-- **data_sim_rdt.R**: The function ``data_sim_rdt()`` simulates continuous or binary data for two-stage platform trial using simple randomization per period and random patient entry times.
-- **data_sim_block().R**: The function ``data_sim_block()`` simulates continuous or binary data for two-stage platform trial using block randomization and deterministic patient entry times.
-- **data_sim_brdt().R**: The function ``data_sim_brdt()`` simulates continuous or binary data for two-stage platform trial using block randomization and random patient entry times.
+- **Plots_paper.Rmd**: generates all figures used in the main paper and supplementary material and saves them in the folder _figures_. 
 
-
-
+Figures presented in the main paper have the suffix **_main** (e.g. **cont_response_main.png**), while figures included in the supplementary material are indicated by the suffix **_supp** (e.g. **cont_all_eq_bias_supp.png**).
 
 <!-- ## Example?? -->
 
