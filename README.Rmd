@@ -89,7 +89,7 @@ Running this script results in 100 separate .csv files, named **results_bin_tren
       - **diff_pos** - positive time trend in control and arm 2, varying trend in arm 1
       - **diff_neg** - negative time trend in control and arm 2, varying trend in arm 1
 
-    - additionally, **OR1** refers to scenarios with $OR_1>1$, otherwise $OR_1<1$ is used
+    - additionally, **OR1** refers to scenarios with OR1>1, otherwise OR1<1 is used
 
 
 
@@ -124,7 +124,7 @@ The folder _Supp\_mat_ contains additional results regarding different randomiza
 
 - **Plots_paper.Rmd**: generates all figures used in the main paper and supplementary material and saves them in the folder _figures_. 
 
-Figures presented in the main paper have the suffix **_main** (e.g. **cont_response_main.png**), while figures included in the supplementary material are indicated by the suffix **_supp** (e.g. **cont_all_eq_bias_supp.png**).
+Figures presented in the main paper have the suffix **\_main** (e.g. **cont_response_main.png**), while figures included in the supplementary material are indicated by the suffix **\_supp** (e.g. **cont_all_eq_bias_supp.png**).
 
 <!-- ## Example?? -->
 

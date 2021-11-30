@@ -85,7 +85,7 @@ Running this script results in 100 separate .csv files, named **results\_bin\_tr
     -   **diff\_pos** - positive time trend in control and arm 2, varying trend in arm 1
     -   **diff\_neg** - negative time trend in control and arm 2, varying trend in arm 1
 
-    -   additionally, **OR1** refers to scenarios with *O**R*<sub>1</sub> &gt; 1, otherwise *O**R*<sub>1</sub> &lt; 1 is used
+    -   additionally, **OR1** refers to scenarios with OR1&gt;1, otherwise OR1&lt;1 is used
 
 -   For continuous endpoints, the given scenario is indicated in the file name as follows: **results\_cont\_trendpattern\_hypothesis\_trendtype.csv**, where
 
@@ -117,7 +117,7 @@ Figures
 
 -   **Plots\_paper.Rmd**: generates all figures used in the main paper and supplementary material and saves them in the folder *figures*.
 
-Figures presented in the main paper have the suffix \*\*\_main\*\* (e.g. **cont\_response\_main.png**), while figures included in the supplementary material are indicated by the suffix \*\*\_supp\*\* (e.g. **cont\_all\_eq\_bias\_supp.png**).
+Figures presented in the main paper have the suffix **\_main** (e.g. **cont\_response\_main.png**), while figures included in the supplementary material are indicated by the suffix **\_supp** (e.g. **cont\_all\_eq\_bias\_supp.png**).
 
 <!-- ## Example?? -->
 <!-- This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated. -->
