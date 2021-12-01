@@ -1,33 +1,34 @@
 ---
 title: "Randomization and non-concurrent controls"
-author: "M. Bofill Roig and M. Posch"
+author: ""
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette :
-    toc: true
-vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: hide 
+    theme: readable
+    # journal, readable, paper 
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
                       cache = TRUE)
 ```
 
-```{r}
+```{r, include = FALSE}
 library(tidyverse)
-library(gridExtra)
 
-source("linear_model.R") #script model-based approaches  
-source("log_model.R") #script model-based approaches  
-source("trend_functions.R") #script time trends
-source("data_sim.R") #script data generation randomization procedure I
-source("data_sim_rdt.R") #script data generation randomization procedure II
-source("data_sim_order.R") #script data generation randomization procedure III
-source("data_sim_block.R") #script data generation randomization procedure IV
-source("data_sim_brdt.R") #script data generation randomization procedure V
+source("../functions/linear_model.R") #script model-based approaches  
+source("../functions/log_model.R") #script model-based approaches  
+source("../functions/trend_functions.R") #script time trends
+source("../functions/data_sim.R") #script data generation randomization procedure I
+source("../functions/data_sim_rdt.R") #script data generation randomization procedure II
+source("../functions/data_sim_block.R") #script data generation randomization procedure III
+source("../functions/data_sim_brdt.R") #script data generation randomization procedure VI
 ```
 
 ```{r}
@@ -41,13 +42,15 @@ set.seed(3214)
 alpha=0.025
 delta=c(0.25,0)
 OR=c(1.8,1)
-#nsim=100
+
 nsim=100000
 ```
 
-## Randomization sequence per period
+## Simple randomization per period
 
 ### Deterministic times 
+
+#### Extreme time trend
 
 ```{r}
 # Extreme time trend
@@ -57,6 +60,8 @@ x <- replicate(nsim,
                                delta=delta, alpha=alpha)[3])
 sum(as.numeric(x))/nsim
 ```
+
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -69,6 +74,8 @@ sum(as.numeric(x))/nsim
 
 ### Random times
 
+#### Extreme time trend
+
 ```{r}
 # Extreme time trend
 x <- replicate(nsim,
@@ -77,6 +84,7 @@ x <- replicate(nsim,
 sum(as.numeric(x))/nsim
 ```
 
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -91,6 +99,8 @@ sum(as.numeric(x))/nsim
 
 ### Deterministic times 
 
+#### Extreme time trend
+
 ```{r}
 # Extreme time trend
 x <- replicate(nsim,
@@ -99,6 +109,7 @@ x <- replicate(nsim,
 sum(as.numeric(x))/nsim
 ```
 
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -110,6 +121,8 @@ sum(as.numeric(x))/nsim
 
 ### Random times
 
+#### Extreme time trend
+
 ```{r}
 # Extreme time trend
 x <- replicate(nsim,
@@ -117,6 +130,8 @@ x <- replicate(nsim,
                                delta=delta, alpha=alpha)[3])
 sum(as.numeric(x))/nsim
 ```
+
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -129,9 +144,11 @@ sum(as.numeric(x))/nsim
 
 # Binary endpoints
 
-## Randomization sequence per period
+## Simple randomization per period
 
 ### Deterministic times 
+
+#### Extreme time trend
 
 ```{r}
 # Extreme time trend
@@ -140,6 +157,8 @@ x <- replicate(nsim,
                                OR=OR, alpha=alpha)[3])
 sum(as.numeric(x))/nsim
 ```
+
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -151,6 +170,8 @@ sum(as.numeric(x))/nsim
 
 ### Random times
 
+#### Extreme time trend
+
 ```{r}
 # Extreme time trend
 x <- replicate(nsim,
@@ -158,6 +179,8 @@ x <- replicate(nsim,
                                OR=OR, alpha=alpha)[3])
 sum(as.numeric(x))/nsim
 ```
+
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -171,6 +194,8 @@ sum(as.numeric(x))/nsim
 
 ### Deterministic times
 
+#### Extreme time trend
+
 ```{r}
 # Extreme time trend
 x <- replicate(nsim,
@@ -178,6 +203,8 @@ x <- replicate(nsim,
                                OR=OR, alpha=alpha)[3])
 sum(as.numeric(x))/nsim
 ```
+
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
@@ -189,6 +216,8 @@ sum(as.numeric(x))/nsim
 
 ### Random times
 
+#### Extreme time trend
+
 ```{r}
 # Extreme time trend
 x <- replicate(nsim,
@@ -196,6 +225,8 @@ x <- replicate(nsim,
                                OR=OR, alpha=alpha)[3])
 sum(as.numeric(x))/nsim
 ```
+
+#### Moderate time trend
 
 ```{r}
 # Moderate time trend
