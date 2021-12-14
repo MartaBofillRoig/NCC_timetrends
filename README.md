@@ -4,7 +4,8 @@ non-concurrent controls
 
 This repository contains the main code and R functions to reproduce the
 results of the simulation study in \`\`On model-based time trend
-adjustments in platform trials with non-concurrent controls’’ (XXX).
+adjustments in platform trials with non-concurrent controls’’
+(<https://arxiv.org/abs/2112.06574>).
 
 We investigated frequentist, model-based approaches to adjust for time
 trends in platform trials utilizing non-concurrent controls. We
