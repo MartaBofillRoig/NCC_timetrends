@@ -465,7 +465,7 @@ results_bin_eq <- rbind(results_bin_eq_step,
 
 ## T1E / Power
 
-```{r, fig.width=10, fig.height=8}
+```{r, fig.width=10, fig.height=10}
 hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -476,17 +476,19 @@ ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) 
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda$"), color="Analysis approach:", y=" ") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_eq_pow_alpha_supp.png", width = 10, height = 8)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/bin_all_eq_pow_alpha_supp.png", width = 10, height = 10)
 ```
 
 ## Bias
 
-```{r, fig.width=10, fig.height=9}
-hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alter. hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alter. hypothesis (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
 ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) +
@@ -495,17 +497,19 @@ ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) 
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_eq_bias_supp.png", width = 10, height = 9)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/bin_all_eq_bias_supp.png", width = 10, height = 10)
 ```
 
 ## rMSE
 
-```{r, fig.width=10, fig.height=9}
-hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alter. hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alter. hypothesis (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
 ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) +
@@ -514,11 +518,13 @@ ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) 
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_eq_rmse_supp.png", width = 10, height = 9)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/bin_all_eq_rmse_supp.png", width = 10, height = 10)
 ```
 
 
@@ -561,7 +567,7 @@ results_bin_diff_step <- results_bin_diff_step %>%
 
 ## Stepwise trend - T1E / Power
 
-```{r, fig.width=10, fig.height=6}
+```{r, fig.width=10, fig.height=10}
 results_bin_diff_step_1 <- results_bin_diff_step %>%
   mutate(hypothesis_1 = ifelse(hypothesis %in% c("H0", "H0_1"), "H0", "H1"),
          OR_1 = ifelse(hypothesis %in% c("H0", "H1"), "OR1", "OR1_1"))
@@ -582,12 +588,14 @@ ggplot(get_data_plot_prob_1(results_bin_diff_step_1) %>% filter(model %in% c("a2
   facet_grid(hypothesis_1 ~ OR_1, scales = "free", 
              labeller = labeller(hypothesis_1  = as_labeller(hypothesis_1_names),
                                  OR_1  = as_labeller(OR1_names))) +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  ggsave("figures/bin_step_diff_pos_pow_alpha_main.png", width = 10, height = 6)
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical")
+  
+ggsave("figures/bin_step_diff_pos_pow_alpha_main.png", width = 10, height = 10)
 ```
 
-```{r, fig.width=10, fig.height=6}
+```{r, fig.width=10, fig.height=10}
 results_bin_diff_step_1 <- results_bin_diff_step %>%
   mutate(hypothesis_1 = ifelse(hypothesis %in% c("H0", "H0_1"), "H0", "H1"),
          OR_1 = ifelse(hypothesis %in% c("H0", "H1"), "OR1", "OR1_1"))
@@ -608,12 +616,14 @@ ggplot(get_data_plot_prob_1(results_bin_diff_step_1) %>% filter(model!="zsep", m
   facet_grid(hypothesis_1 ~ OR_1, scales = "free", 
              labeller = labeller(hypothesis_1  = as_labeller(hypothesis_1_names),
                                  OR_1  = as_labeller(OR1_names))) +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  ggsave("figures/bin_step_diff_pos_pow_alpha_supp.png", width = 10, height = 6)
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical")
+  
+ggsave("figures/bin_step_diff_pos_pow_alpha_supp.png", width = 10, height = 10)
 ```
 
-```{r, fig.width=10, fig.height=6}
+```{r, fig.width=10, fig.height=10}
 results_bin_diff_step_1 <- results_bin_diff_step %>%
   mutate(hypothesis_1 = ifelse(hypothesis %in% c("H0", "H0_1"), "H0", "H1"),
          OR_1 = ifelse(hypothesis %in% c("H0", "H1"), "OR1", "OR1_1"))
@@ -634,9 +644,11 @@ ggplot(get_data_plot_prob_1(results_bin_diff_step_1) %>% filter(model!="zsep", m
   facet_grid(hypothesis_1 ~ OR_1, scales = "free", 
              labeller = labeller(hypothesis_1  = as_labeller(hypothesis_1_names),
                                  OR_1  = as_labeller(OR1_names))) +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  ggsave("figures/bin_step_diff_neg_pow_alpha_supp.png", width = 10, height = 6)
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical")
+  
+ggsave("figures/bin_step_diff_neg_pow_alpha_supp.png", width = 10, height = 10)
 ```
 
 
@@ -737,7 +749,7 @@ results_bin_diff <- rbind(results_bin_diff_step %>% select(-c(p_0, p_1, p_2, p1,
 
 ## T1E / Power
 
-```{r, fig.width=10, fig.height=8}
+```{r, fig.width=10, fig.height=10}
 hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -748,14 +760,15 @@ ggplot(get_data_plot(results_bin_diff) %>% filter(model %in% c("a2", "a2_int", "
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
-  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_diff_pos_pow_alpha_main.png", width = 10, height = 8)
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures/bin_all_diff_pos_pow_alpha_main.png", width = 10, height = 10)
 ```
 
-```{r, fig.width=10, fig.height=8}
+```{r, fig.width=10, fig.height=10}
 hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -766,14 +779,16 @@ ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol",
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_diff_pos_pow_alpha_supp.png", width = 10, height = 8)
+  scale_x_continuous(n.breaks = 3)
+
+ggsave("figures/bin_all_diff_pos_pow_alpha_supp.png", width = 10, height = 10)
 ```
 
-```{r, fig.width=10, fig.height=8}
+```{r, fig.width=10, fig.height=10}
 hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -784,17 +799,19 @@ ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol",
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_diff_neg_pow_alpha_supp.png", width = 10, height = 8)
+  scale_x_continuous(n.breaks = 3)
+
+ggsave("figures/bin_all_diff_neg_pow_alpha_supp.png", width = 10, height = 10)
 ```
 
 ## Bias
 
-```{r, fig.width=10, fig.height=9}
-hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alter. hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alter. hypothesis (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
 ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_pos")) +
@@ -803,17 +820,19 @@ ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol",
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_diff_pos_bias_supp.png", width = 10, height = 9)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/bin_all_diff_pos_bias_supp.png", width = 10, height = 10)
 ```
 
 ## rMSE
 
-```{r, fig.width=10, fig.height=9}
-hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alter. hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alter. hypothesis (OR1>1)")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
 ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_pos")) +
@@ -822,11 +841,13 @@ ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol",
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/bin_all_diff_pos_rmse_supp.png", width = 10, height = 9)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/bin_all_diff_pos_rmse_supp.png", width = 10, height = 10)
 ```
 
 
@@ -859,7 +880,7 @@ results_cont_eq <- rbind(results_cont_lin_alpha_eq,
 
 ## T1E / Power
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=7}
 hypothesis_names <- c(H0="Type I error rate", H1="Power")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -870,16 +891,17 @@ ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol"))
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda$"), color="Analysis approach:", y=" ") +
-  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/cont_all_eq_pow_alpha_supp.png", width = 10, height = 5)
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures/cont_all_eq_pow_alpha_supp.png", width = 10, height = 7)
 ```
 
 ## Bias
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=7}
 hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -889,16 +911,17 @@ ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol"))
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
-  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/cont_all_eq_bias_supp.png", width = 10, height = 5)
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures/cont_all_eq_bias_supp.png", width = 10, height = 7)
 ```
 
 ## rMSE
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=7}
 hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -908,11 +931,12 @@ ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol"))
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
-  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
-  ggsave("figures/cont_all_eq_rmse_supp.png", width = 10, height = 5)
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+
+ggsave("figures/cont_all_eq_rmse_supp.png", width = 10, height = 7)
 ```
 
 
@@ -954,7 +978,7 @@ results_cont_diff <- results_cont_diff %>%
 
 ## T1E / Power
 
-```{r, fig.width=7, fig.height=6}
+```{r, fig.width=10, fig.height=10}
 hypothesis_names <- c(H0="Type I error rate", H1="Power")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -966,7 +990,7 @@ ggarrange(ggplot(get_data_plot_mu(results_cont_diff) %>% filter(model %in% c("a2
             facet_grid(hypothesis ~ trend, scales = "free", 
                        labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                            trend  = as_labeller(trend_names))) +
-            theme_bw() +
+            theme_bw(base_size = 14) +
             theme(legend.position = "bottom") +
             scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")),
           
@@ -978,17 +1002,18 @@ ggarrange(ggplot(get_data_plot_mu(results_cont_diff) %>% filter(model %in% c("a2
             facet_grid(hypothesis ~ trend, scales = "free", 
                        labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                            trend  = as_labeller(trend_names))) +
-            theme_bw() +
+            theme_bw(base_size = 14) +
             theme(legend.position = "bottom",
                   strip.text.x = element_blank()) +
             scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")),
           
-          common.legend = T, ncol = 1, legend = "bottom") +
-  ggsave("figures/cont_step_diff_pow_alpha_main.png", width = 7, height = 6)
+          common.legend = T, ncol = 1, legend = "bottom")
+  
+ggsave("figures/cont_step_diff_pow_alpha_main.png", width = 10, height = 10)
 ```
 
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=8}
 hypothesis_names <- c(H0="Type I error rate", H1="Power")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -999,15 +1024,16 @@ ggplot(get_data_plot(results_cont_diff) %>% filter(model %in% c("a2", "a2_int", 
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")) +
-  scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)) +
-  ggsave("figures/cont_all_diff_pow_alpha_main.png", width = 10, height = 5)
+  scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05))
+  
+ggsave("figures/cont_all_diff_pow_alpha_main.png", width = 10, height = 8)
 ```
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=7}
 hypothesis_names <- c(H0="Type I error rate", H1="Power")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -1018,17 +1044,19 @@ ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol"
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
   scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)) +
-  ggsave("figures/cont_all_diff_pow_alpha_supp.png", width = 10, height = 5)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/cont_all_diff_pow_alpha_supp.png", width = 10, height = 7)
 ```
 
 ## Bias
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=7}
 hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -1038,17 +1066,19 @@ ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol"
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
   scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)) +
-  ggsave("figures/cont_all_diff_bias_supp.png", width = 10, height = 5)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/cont_all_diff_bias_supp.png", width = 10, height = 7)
 ```
 
 ## rMSE
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=7}
 hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
 trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
 
@@ -1058,12 +1088,14 @@ ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol"
   facet_grid(hypothesis ~ trend, scales = "free", 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  trend = as_labeller(trend_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 14) +
   theme(legend.position = "bottom") +
   labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
   scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
   scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)) +
-  ggsave("figures/cont_all_diff_rmse_supp.png", width = 10, height = 5)
+  scale_x_continuous(n.breaks = 3)
+  
+ggsave("figures/cont_all_diff_rmse_supp.png", width = 10, height = 7)
 ```
 
 
@@ -1126,7 +1158,7 @@ for (i in 1:nrow(response_cont)) {
 }
 ```
 
-```{r, fig.width=10, fig.height=4}
+```{r, fig.width=10, fig.height=5}
 hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
 scenario_names <- c(`Linear trend` = "Linear", `Stepwise trend` = "Stepwise", `Inverted U-1 trend` = "Inverted-U (N[p] == 125)", `Inverted U-2 trend` = "Inverted-U (N[p] == 250)", `Inverted U-3 trend` = "Inverted-U (N[p] == 500)")
 
@@ -1135,10 +1167,11 @@ ggplot(response_cont_plot) +
   facet_grid(hypothesis ~ scenario, 
              labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
                                  scenario = as_labeller(scenario_names, label_parsed))) +
-  theme_bw() +
+  theme_bw(base_size = 12) +
   scale_color_lancet() +
-  labs(x="Patient recruitment", y="Means", color="Treatment") +
-  ggsave("figures/cont_response_main.png", width = 10, height = 4)
+  labs(x="Patient recruitment", y="Means", color="Treatment")
+  
+ggsave("figures/cont_response_main.png", width = 10, height = 5)
 ```
 
 
