@@ -1,0 +1,1268 @@
+---
+title: "Simulation non-concurrent control data"
+author: ""
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: hide 
+    theme: readable
+    # journal, readable, paper 
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(latex2exp)
+library(ggpubr)
+library(ggnewscale)
+library(RColorBrewer)
+library(ggsci)
+library(scales)
+library(patchwork)
+
+source("functions/linear_model.R")
+source("functions/log_model.R")
+source("functions/z_test.R")
+source("functions/t_test.R")
+source("functions/z_prop_test.R")
+source("functions/trend_functions.R")
+source("functions/data_sim_block.R")
+source("functions/allinone_model.R")
+source("functions/allinone_sim.R")
+source("functions/allinone_sim_par.R")
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>")
+```
+
+```{r}
+# Load data
+
+# Binary stepwise
+results_bin_step_add_alpha_eq <- read_csv("results/results_bin_step_add_alpha_eq.csv")
+results_bin_step_mult_alpha_eq <- read_csv("results/results_bin_step_mult_alpha_eq.csv")
+results_bin_step_add_pow_eq <- read_csv("results/results_bin_step_add_pow_eq.csv")
+results_bin_step_mult_pow_eq <- read_csv("results/results_bin_step_mult_pow_eq.csv")
+
+results_bin_step_add_alpha_OR1_eq <- read_csv("results/results_bin_step_add_alpha_OR1_eq.csv")
+results_bin_step_mult_alpha_OR1_eq <- read_csv("results/results_bin_step_mult_alpha_OR1_eq.csv")
+results_bin_step_add_pow_OR1_eq <- read_csv("results/results_bin_step_add_pow_OR1_eq.csv")
+results_bin_step_mult_pow_OR1_eq <- read_csv("results/results_bin_step_mult_pow_OR1_eq.csv")
+
+results_bin_step_mult_alpha_diff_neg <- read_csv("results/results_bin_step_mult_alpha_diff_neg.csv")
+results_bin_step_mult_pow_diff_neg <- read_csv("results/results_bin_step_mult_pow_diff_neg.csv")
+results_bin_step_mult_alpha_OR1_diff_neg <- read_csv("results/results_bin_step_mult_alpha_OR1_diff_neg.csv")
+results_bin_step_mult_pow_OR1_diff_neg <- read_csv("results/results_bin_step_mult_pow_OR1_diff_neg.csv")
+
+results_bin_step_mult_alpha_diff_pos <- read_csv("results/results_bin_step_mult_alpha_diff_pos.csv")
+results_bin_step_mult_pow_diff_pos <- read_csv("results/results_bin_step_mult_pow_diff_pos.csv")
+results_bin_step_mult_alpha_OR1_diff_pos <- read_csv("results/results_bin_step_mult_alpha_OR1_diff_pos.csv")
+results_bin_step_mult_pow_OR1_diff_pos <- read_csv("results/results_bin_step_mult_pow_OR1_diff_pos.csv")
+
+# Binary linear
+
+results_bin_lin_add_alpha_eq <- read_csv("results/results_bin_lin_add_alpha_eq.csv")
+results_bin_lin_mult_alpha_eq <- read_csv("results/results_bin_lin_mult_alpha_eq.csv")
+results_bin_lin_add_pow_eq <- read_csv("results/results_bin_lin_add_pow_eq.csv")
+results_bin_lin_mult_pow_eq <- read_csv("results/results_bin_lin_mult_pow_eq.csv")
+
+results_bin_lin_add_alpha_OR1_eq <- read_csv("results/results_bin_lin_add_alpha_OR1_eq.csv")
+results_bin_lin_mult_alpha_OR1_eq <- read_csv("results/results_bin_lin_mult_alpha_OR1_eq.csv")
+results_bin_lin_add_pow_OR1_eq <- read_csv("results/results_bin_lin_add_pow_OR1_eq.csv")
+results_bin_lin_mult_pow_OR1_eq <- read_csv("results/results_bin_lin_mult_pow_OR1_eq.csv")
+
+results_bin_lin_mult_alpha_diff_neg <- read_csv("results/results_bin_lin_mult_alpha_diff_neg.csv")
+results_bin_lin_mult_pow_diff_neg <- read_csv("results/results_bin_lin_mult_pow_diff_neg.csv")
+results_bin_lin_mult_alpha_OR1_diff_neg <- read_csv("results/results_bin_lin_mult_alpha_OR1_diff_neg.csv")
+results_bin_lin_mult_pow_OR1_diff_neg <- read_csv("results/results_bin_lin_mult_pow_OR1_diff_neg.csv")
+
+results_bin_lin_mult_alpha_diff_pos <- read_csv("results/results_bin_lin_mult_alpha_diff_pos.csv")
+results_bin_lin_mult_pow_diff_pos <- read_csv("results/results_bin_lin_mult_pow_diff_pos.csv")
+results_bin_lin_mult_alpha_OR1_diff_pos <- read_csv("results/results_bin_lin_mult_alpha_OR1_diff_pos.csv")
+results_bin_lin_mult_pow_OR1_diff_pos <- read_csv("results/results_bin_lin_mult_pow_OR1_diff_pos.csv")
+
+# Binary inverted U-1
+
+results_bin_inv_1_add_alpha_eq <- read_csv("results/results_bin_inv_1_add_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_alpha_eq <- read_csv("results/results_bin_inv_1_mult_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_add_pow_eq <- read_csv("results/results_bin_inv_1_add_pow_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_pow_eq <- read_csv("results/results_bin_inv_1_mult_pow_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+
+results_bin_inv_1_add_alpha_OR1_eq <- read_csv("results/results_bin_inv_1_add_alpha_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_alpha_OR1_eq <- read_csv("results/results_bin_inv_1_mult_alpha_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_add_pow_OR1_eq <- read_csv("results/results_bin_inv_1_add_pow_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_pow_OR1_eq <- read_csv("results/results_bin_inv_1_mult_pow_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+
+results_bin_inv_1_mult_alpha_diff_neg <- read_csv("results/results_bin_inv_1_mult_alpha_diff_neg.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_pow_diff_neg <- read_csv("results/results_bin_inv_1_mult_pow_diff_neg.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_alpha_OR1_diff_neg <- read_csv("results/results_bin_inv_1_mult_alpha_OR1_diff_neg.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_pow_OR1_diff_neg <- read_csv("results/results_bin_inv_1_mult_pow_OR1_diff_neg.csv") %>%
+  mutate(trend = "inv_u_1")
+
+results_bin_inv_1_mult_alpha_diff_pos <- read_csv("results/results_bin_inv_1_mult_alpha_diff_pos.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_pow_diff_pos <- read_csv("results/results_bin_inv_1_mult_pow_diff_pos.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_alpha_OR1_diff_pos <- read_csv("results/results_bin_inv_1_mult_alpha_OR1_diff_pos.csv") %>%
+  mutate(trend = "inv_u_1")
+results_bin_inv_1_mult_pow_OR1_diff_pos <- read_csv("results/results_bin_inv_1_mult_pow_OR1_diff_pos.csv") %>%
+  mutate(trend = "inv_u_1")
+
+# Binary inverted U-2
+
+results_bin_inv_2_add_alpha_eq <- read_csv("results/results_bin_inv_2_add_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_alpha_eq <- read_csv("results/results_bin_inv_2_mult_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_add_pow_eq <- read_csv("results/results_bin_inv_2_add_pow_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_pow_eq <- read_csv("results/results_bin_inv_2_mult_pow_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+
+results_bin_inv_2_add_alpha_OR1_eq <- read_csv("results/results_bin_inv_2_add_alpha_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_alpha_OR1_eq <- read_csv("results/results_bin_inv_2_mult_alpha_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_add_pow_OR1_eq <- read_csv("results/results_bin_inv_2_add_pow_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_pow_OR1_eq <- read_csv("results/results_bin_inv_2_mult_pow_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+
+results_bin_inv_2_mult_alpha_diff_neg <- read_csv("results/results_bin_inv_2_mult_alpha_diff_neg.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_pow_diff_neg <- read_csv("results/results_bin_inv_2_mult_pow_diff_neg.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_alpha_OR1_diff_neg <- read_csv("results/results_bin_inv_2_mult_alpha_OR1_diff_neg.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_pow_OR1_diff_neg <- read_csv("results/results_bin_inv_2_mult_pow_OR1_diff_neg.csv") %>%
+  mutate(trend = "inv_u_2")
+
+results_bin_inv_2_mult_alpha_diff_pos <- read_csv("results/results_bin_inv_2_mult_alpha_diff_pos.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_pow_diff_pos <- read_csv("results/results_bin_inv_2_mult_pow_diff_pos.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_alpha_OR1_diff_pos <- read_csv("results/results_bin_inv_2_mult_alpha_OR1_diff_pos.csv") %>%
+  mutate(trend = "inv_u_2")
+results_bin_inv_2_mult_pow_OR1_diff_pos <- read_csv("results/results_bin_inv_2_mult_pow_OR1_diff_pos.csv") %>%
+  mutate(trend = "inv_u_2")
+
+# Binary inverted U-3
+
+results_bin_inv_3_add_alpha_eq <- read_csv("results/results_bin_inv_3_add_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_alpha_eq <- read_csv("results/results_bin_inv_3_mult_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_add_pow_eq <- read_csv("results/results_bin_inv_3_add_pow_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_pow_eq <- read_csv("results/results_bin_inv_3_mult_pow_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+
+results_bin_inv_3_add_alpha_OR1_eq <- read_csv("results/results_bin_inv_3_add_alpha_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_alpha_OR1_eq <- read_csv("results/results_bin_inv_3_mult_alpha_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_add_pow_OR1_eq <- read_csv("results/results_bin_inv_3_add_pow_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_pow_OR1_eq <- read_csv("results/results_bin_inv_3_mult_pow_OR1_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+
+results_bin_inv_3_mult_alpha_diff_neg <- read_csv("results/results_bin_inv_3_mult_alpha_diff_neg.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_pow_diff_neg <- read_csv("results/results_bin_inv_3_mult_pow_diff_neg.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_alpha_OR1_diff_neg <- read_csv("results/results_bin_inv_3_mult_alpha_OR1_diff_neg.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_pow_OR1_diff_neg <- read_csv("results/results_bin_inv_3_mult_pow_OR1_diff_neg.csv") %>%
+  mutate(trend = "inv_u_3")
+
+results_bin_inv_3_mult_alpha_diff_pos <- read_csv("results/results_bin_inv_3_mult_alpha_diff_pos.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_pow_diff_pos <- read_csv("results/results_bin_inv_3_mult_pow_diff_pos.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_alpha_OR1_diff_pos <- read_csv("results/results_bin_inv_3_mult_alpha_OR1_diff_pos.csv") %>%
+  mutate(trend = "inv_u_3")
+results_bin_inv_3_mult_pow_OR1_diff_pos <- read_csv("results/results_bin_inv_3_mult_pow_OR1_diff_pos.csv") %>%
+  mutate(trend = "inv_u_3")
+
+
+
+
+
+# Continuous stepwise
+
+results_cont_step_alpha_eq <- read_csv("results/results_cont_step_alpha_eq.csv")
+results_cont_step_pow_eq <- read_csv("results/results_cont_step_pow_eq.csv")
+results_cont_step_alpha_diff <- read_csv("results/results_cont_step_alpha_diff.csv")
+results_cont_step_pow_diff <- read_csv("results/results_cont_step_pow_diff.csv")
+
+# Continuous linear
+
+results_cont_lin_alpha_eq <- read_csv("results/results_cont_lin_alpha_eq.csv")
+results_cont_lin_pow_eq <- read_csv("results/results_cont_lin_pow_eq.csv")
+results_cont_lin_alpha_diff <- read_csv("results/results_cont_lin_alpha_diff.csv")
+results_cont_lin_pow_diff <- read_csv("results/results_cont_lin_pow_diff.csv")
+
+# Continuous inverted U-1
+
+results_cont_inv_1_alpha_eq <- read_csv("results/results_cont_inv_1_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_cont_inv_1_pow_eq <- read_csv("results/results_cont_inv_1_pow_eq.csv") %>%
+  mutate(trend = "inv_u_1")
+results_cont_inv_1_alpha_diff <- read_csv("results/results_cont_inv_1_alpha_diff.csv") %>%
+  mutate(trend = "inv_u_1")
+results_cont_inv_1_pow_diff <- read_csv("results/results_cont_inv_1_pow_diff.csv") %>%
+  mutate(trend = "inv_u_1")
+
+# Continuous inverted U-2
+
+results_cont_inv_2_alpha_eq <- read_csv("results/results_cont_inv_2_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_cont_inv_2_pow_eq <- read_csv("results/results_cont_inv_2_pow_eq.csv") %>%
+  mutate(trend = "inv_u_2")
+results_cont_inv_2_alpha_diff <- read_csv("results/results_cont_inv_2_alpha_diff.csv") %>%
+  mutate(trend = "inv_u_2")
+results_cont_inv_2_pow_diff <- read_csv("results/results_cont_inv_2_pow_diff.csv") %>%
+  mutate(trend = "inv_u_2")
+
+# Continuous inverted U-3
+
+results_cont_inv_3_alpha_eq <- read_csv("results/results_cont_inv_3_alpha_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_cont_inv_3_pow_eq <- read_csv("results/results_cont_inv_3_pow_eq.csv") %>%
+  mutate(trend = "inv_u_3")
+results_cont_inv_3_alpha_diff <- read_csv("results/results_cont_inv_3_alpha_diff.csv") %>%
+  mutate(trend = "inv_u_3")
+results_cont_inv_3_pow_diff <- read_csv("results/results_cont_inv_3_pow_diff.csv") %>%
+  mutate(trend = "inv_u_3")
+```
+
+```{r}
+my_palette = c("#ED0000FF",
+               "#925E9FFF",
+               "#00468BFF",
+               "#42B540FF",
+               "#EEAD0E",
+               "#0099B4FF",
+               "#FDAF91FF",
+               "#ADB6B6FF",
+               "#1B1919FF")
+
+#show_col(my_palette)
+```
+
+
+```{r}
+# Functions
+
+get_data_plot <- function(data_csv){
+  
+  data_reject <- data_csv %>%
+    select(c(1:21, starts_with("reject"), scenario, alpha)) %>%
+    pivot_longer(cols = starts_with("reject"),
+                 names_to = c("model"),
+                 names_prefix = "reject_h02_",
+                 values_to = "reject_h02")
+  
+  data_rMSE <- data_csv %>%
+    select(c(1:21, starts_with("rMSE"), scenario, alpha)) %>%
+    pivot_longer(cols = starts_with("rMSE"),
+                 names_to = c("model"),
+                 names_prefix = "rMSE_",
+                 values_to = "rMSE")
+  
+  data_bias <- data_csv %>%
+    select(c(1:21, starts_with("bias"), scenario, alpha)) %>%
+    pivot_longer(cols = starts_with("bias"),
+                 names_to = c("model"),
+                 names_prefix = "bias_",
+                 values_to = "bias")
+  
+  data_plot <- data_reject %>%
+    left_join(data_rMSE) %>%
+    left_join(data_bias)
+  
+  data_plot
+}
+
+
+get_data_plot_prob <- function(data_csv){
+  
+  data_reject <- data_csv %>%
+    select(c(1:21, starts_with("reject"), scenario, p_0, p_1, p_2, alpha)) %>%
+    pivot_longer(cols = starts_with("reject"),
+                 names_to = c("model"),
+                 names_prefix = "reject_h02_",
+                 values_to = "reject_h02")
+  
+  data_rMSE <- data_csv %>%
+    select(c(1:21, starts_with("rMSE"), scenario, p_0, p_1, p_2, alpha)) %>%
+    pivot_longer(cols = starts_with("rMSE"),
+                 names_to = c("model"),
+                 names_prefix = "rMSE_",
+                 values_to = "rMSE")
+  
+  data_bias <- data_csv %>%
+    select(c(1:21, starts_with("bias"), scenario, p_0, p_1, p_2, alpha)) %>%
+    pivot_longer(cols = starts_with("bias"),
+                 names_to = c("model"),
+                 names_prefix = "bias_",
+                 values_to = "bias")
+  
+  data_p_a2 <- data_csv %>%
+    select(c(1:21, starts_with("p_a2"), scenario, p_0, p_1, p_2, alpha)) %>%
+    pivot_longer(cols = starts_with("p_a2"),
+                 names_to = c("OR_RR_RD"),
+                 names_prefix = "p_a2_",
+                 values_to = "p_a2")
+  
+  data_plot <- data_reject %>%
+    left_join(data_rMSE) %>%
+    left_join(data_bias) %>%
+    left_join(data_p_a2)
+  
+  data_plot
+}
+
+
+get_data_plot_prob_1 <- function(data_csv){
+  
+  data_reject <- data_csv %>%
+    select(c(1:21, starts_with("reject"), scenario, p_0, p_1, p_2, alpha, hypothesis_1, OR_1)) %>%
+    pivot_longer(cols = starts_with("reject"),
+                 names_to = c("model"),
+                 names_prefix = "reject_h02_",
+                 values_to = "reject_h02")
+  
+  data_rMSE <- data_csv %>%
+    select(c(1:21, starts_with("rMSE"), scenario, p_0, p_1, p_2, alpha, hypothesis_1, OR_1)) %>%
+    pivot_longer(cols = starts_with("rMSE"),
+                 names_to = c("model"),
+                 names_prefix = "rMSE_",
+                 values_to = "rMSE")
+  
+  data_bias <- data_csv %>%
+    select(c(1:21, starts_with("bias"), scenario, p_0, p_1, p_2, alpha, hypothesis_1, OR_1)) %>%
+    pivot_longer(cols = starts_with("bias"),
+                 names_to = c("model"),
+                 names_prefix = "bias_",
+                 values_to = "bias")
+  
+  data_p_a2 <- data_csv %>%
+    select(c(1:21, starts_with("p_a2"), scenario, p_0, p_1, p_2, alpha, hypothesis_1, OR_1)) %>%
+    pivot_longer(cols = starts_with("p_a2"),
+                 names_to = c("OR_RR_RD"),
+                 names_prefix = "p_a2_",
+                 values_to = "p_a2")
+  
+  data_plot <- data_reject %>%
+    left_join(data_rMSE) %>%
+    left_join(data_bias) %>%
+    left_join(data_p_a2)
+  
+  data_plot
+}
+
+
+get_data_plot_mu <- function(data_csv){
+  
+  data_reject <- data_csv %>%
+    select(c(1:20, starts_with("reject"), scenario, mu_0, mu_1, mu_2, alpha)) %>%
+    pivot_longer(cols = starts_with("reject"),
+                 names_to = c("model"),
+                 names_prefix = "reject_h02_",
+                 values_to = "reject_h02")
+  
+  data_rMSE <- data_csv %>%
+    select(c(1:20, starts_with("rMSE"), scenario, mu_0, mu_1, mu_2, alpha)) %>%
+    pivot_longer(cols = starts_with("rMSE"),
+                 names_to = c("model"),
+                 names_prefix = "rMSE_",
+                 values_to = "rMSE")
+  
+  data_bias <- data_csv %>%
+    select(c(1:20, starts_with("bias"), scenario, mu_0, mu_1, mu_2, alpha)) %>%
+    pivot_longer(cols = starts_with("bias"),
+                 names_to = c("model"),
+                 names_prefix = "bias_",
+                 values_to = "bias")
+  
+  data_plot <- data_reject %>%
+    left_join(data_rMSE) %>%
+    left_join(data_bias)
+  
+  data_plot
+}
+
+
+get_OR_RR_RD <- function(p_c1, p_c2, p_a1){
+  OR_c <- (p_c1/(1-p_c1))/(p_c2/(1-p_c2))
+  O_a1 <- (p_a1/(1-p_a1))
+  p_a2_OR <- (O_a1/OR_c)/(1+(O_a1/OR_c))
+  
+  p_a2_RR <- p_a1/(p_c1/p_c2)
+  
+  p_a2_RD <- p_a1-p_c1+p_c2
+  
+  return(list(p_a2_OR=p_a2_OR, p_a2_RR=p_a2_RR, p_a2_RD=p_a2_RD))
+}
+```
+
+
+# Binary endpoint - equal trends
+
+```{r}
+results_bin_eq_step <- rbind(results_bin_step_mult_alpha_eq,
+                             results_bin_step_mult_pow_eq,
+                             results_bin_step_mult_alpha_OR1_eq,
+                             results_bin_step_mult_pow_OR1_eq)
+
+results_bin_eq_lin <- rbind(results_bin_lin_mult_alpha_eq,
+                            results_bin_lin_mult_pow_eq,
+                            results_bin_lin_mult_alpha_OR1_eq,
+                            results_bin_lin_mult_pow_OR1_eq)
+
+results_bin_eq_inv_1 <- rbind(results_bin_inv_1_mult_alpha_eq,
+                              results_bin_inv_1_mult_pow_eq,
+                              results_bin_inv_1_mult_alpha_OR1_eq,
+                              results_bin_inv_1_mult_pow_OR1_eq)
+
+results_bin_eq_inv_2 <- rbind(results_bin_inv_2_mult_alpha_eq,
+                              results_bin_inv_2_mult_pow_eq,
+                              results_bin_inv_2_mult_alpha_OR1_eq,
+                              results_bin_inv_2_mult_pow_OR1_eq)
+
+results_bin_eq_inv_3 <- rbind(results_bin_inv_3_mult_alpha_eq,
+                              results_bin_inv_3_mult_pow_eq,
+                              results_bin_inv_3_mult_alpha_OR1_eq,
+                              results_bin_inv_3_mult_pow_OR1_eq)
+
+results_bin_eq <- rbind(results_bin_eq_step,
+                        results_bin_eq_lin,
+                        results_bin_eq_inv_1 %>% select(-N_peak),
+                        results_bin_eq_inv_2 %>% select(-N_peak),
+                        results_bin_eq_inv_3 %>% select(-N_peak)) %>%
+  mutate(scenario = factor(case_when(trend_param=="add" & lambda0 >=0 ~ "add_pos",
+                                     trend_param=="add" & lambda0 <0 ~ "add_neg",
+                                     trend_param=="mult" & lambda0 >=0 ~ "mult_pos",
+                                     trend_param=="mult" & lambda0 <0 ~ "mult_neg"),
+                           levels = c("add_neg", "add_pos", "mult_neg", "mult_pos")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+## T1E / Power
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol" & hypothesis %in% c("H0", "H0_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Type I error") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol" & hypothesis %in% c("H1", "H1_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Power") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          common.legend = T, legend = "bottom")
+
+
+
+ggsave("figures_transposed/bin_all_eq_pow_alpha_supp_t.png", width = 9, height = 10)
+```
+
+## Bias
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures_transposed/bin_all_eq_bias_supp_t.png", width = 9, height = 10)
+```
+
+## rMSE
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_bin_eq) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures_transposed/bin_all_eq_rmse_supp_t.png", width = 9, height = 10)
+```
+
+
+# Binary endpoints - different trends
+
+```{r}
+results_bin_diff_step <- rbind(results_bin_step_mult_alpha_diff_neg,
+                               results_bin_step_mult_pow_diff_neg,
+                               results_bin_step_mult_alpha_OR1_diff_neg,
+                               results_bin_step_mult_pow_OR1_diff_neg,
+                               results_bin_step_mult_alpha_diff_pos,
+                               results_bin_step_mult_pow_diff_pos,
+                               results_bin_step_mult_alpha_OR1_diff_pos,
+                               results_bin_step_mult_pow_OR1_diff_pos) %>%
+  mutate(scenario = factor(case_when(trend_param=="add" & lambda0 >=0 ~ "add_pos",
+                                     trend_param=="add" & lambda0 <0 ~ "add_neg",
+                                     trend_param=="mult" & lambda0 >=0 ~ "mult_pos",
+                                     trend_param=="mult" & lambda0 <0 ~ "mult_neg"),
+                           levels = c("add_neg", "add_pos", "mult_neg", "mult_pos"))) %>%
+  
+  mutate(p_0 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + lambda0))),
+                         trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + lambda0*((n0+n1+n22)-1)/((n0+n1+n22)-1))))), # P_control 2nd period
+         
+         p_1 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1) + lambda1))),
+                         trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1) + lambda1*((n0+n1+n22)-1)/((n0+n1+n22)-1))))), # P_t1 2nd period
+         
+         p_2 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR2) + lambda2))),
+                         trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR2) + lambda2*((n0+n1+n22)-1)/((n0+n1+n22)-1))))), # P_t2 2nd period
+         
+         p1 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1)))),
+                        trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1) + lambda1*(1)/((n0+n1+n22)-1)))))) # P_t1 1st period
+
+
+results_bin_diff_step <- results_bin_diff_step %>%
+  mutate(p_a2_OR = get_OR_RR_RD(p_c1 = results_bin_diff_step$p0, p_c2 = results_bin_diff_step$p_0, p_a1 = results_bin_diff_step$p1)$p_a2_OR,
+         p_a2_RR = get_OR_RR_RD(p_c1 = results_bin_diff_step$p0, p_c2 = results_bin_diff_step$p_0, p_a1 = results_bin_diff_step$p1)$p_a2_RR,
+         p_a2_RD = get_OR_RR_RD(p_c1 = results_bin_diff_step$p0, p_c2 = results_bin_diff_step$p_0, p_a1 = results_bin_diff_step$p1)$p_a2_RD,
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+## Stepwise trend - T1E / Power
+
+```{r, fig.width=10, fig.height=6}
+results_bin_diff_step_1 <- results_bin_diff_step %>%
+  mutate(hypothesis_1 = ifelse(hypothesis %in% c("H0", "H0_1"), "H0", "H1"),
+         OR_1 = ifelse(hypothesis %in% c("H0", "H1"), "OR1", "OR1_1"))
+
+
+hypothesis_1_names <- c(H0="Type I error rate", H1="Power")
+OR1_names <- c(OR1 = "OR1<1", OR1_1 = "OR1>1")
+
+ggplot(get_data_plot_prob_1(results_bin_diff_step_1) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol"), scenario=="mult_pos")) +
+  #geom_point(aes(x=p_1, reject_h02, color=model)) +
+  geom_line(aes(p_1, reject_h02, color=model), size=1) +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")) +
+  labs(x="X=P(Arm 1, Period 2)", y=" ", color="Analysis approach:") +
+  new_scale_color() +
+  geom_vline(aes(xintercept = p_a2, color = OR_RR_RD), linetype = "dashed") +
+  labs(color="") +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(OR_1 ~ hypothesis_1, scales = "free", 
+             labeller = labeller(hypothesis_1  = as_labeller(hypothesis_1_names),
+                                 OR_1  = as_labeller(OR1_names))) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+ggsave("figures_transposed/bin_step_diff_pos_pow_alpha_main_t.png", width = 10, height = 6)
+```
+
+```{r, fig.width=10, fig.height=6}
+results_bin_diff_step_1 <- results_bin_diff_step %>%
+  mutate(hypothesis_1 = ifelse(hypothesis %in% c("H0", "H0_1"), "H0", "H1"),
+         OR_1 = ifelse(hypothesis %in% c("H0", "H1"), "OR1", "OR1_1"))
+
+
+hypothesis_1_names <- c(H0="Type I error rate", H1="Power")
+OR1_names <- c(OR1 = "OR1<1", OR1_1 = "OR1>1")
+
+ggplot(get_data_plot_prob_1(results_bin_diff_step_1) %>% filter(model!="zsep", model!="zpol", scenario=="mult_pos")) +
+  #geom_point(aes(x=p_1, reject_h02, color=model)) +
+  geom_line(aes(p_1, reject_h02, color=model), size=1) +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
+  labs(x="X=P(Arm 1, Period 2)", y=" ", color="Analysis approach:") +
+  new_scale_color() +
+  geom_vline(aes(xintercept = p_a2, color = OR_RR_RD), linetype = "dashed") +
+  labs(color="") +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(OR_1 ~ hypothesis_1, scales = "free", 
+             labeller = labeller(hypothesis_1  = as_labeller(hypothesis_1_names),
+                                 OR_1  = as_labeller(OR1_names))) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+ggsave("figures_transposed/bin_step_diff_pos_pow_alpha_supp_t.png", width = 10, height = 6)
+```
+
+```{r, fig.width=10, fig.height=6}
+results_bin_diff_step_1 <- results_bin_diff_step %>%
+  mutate(hypothesis_1 = ifelse(hypothesis %in% c("H0", "H0_1"), "H0", "H1"),
+         OR_1 = ifelse(hypothesis %in% c("H0", "H1"), "OR1", "OR1_1"))
+
+
+hypothesis_1_names <- c(H0="Type I error rate", H1="Power")
+OR1_names <- c(OR1 = "OR1<1", OR1_1 = "OR1>1")
+
+ggplot(get_data_plot_prob_1(results_bin_diff_step_1) %>% filter(model!="zsep", model!="zpol", scenario=="mult_neg")) +
+  #geom_point(aes(x=p_1, reject_h02, color=model)) +
+  geom_line(aes(p_1, reject_h02, color=model), size=1) +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
+  labs(x="X=P(Arm 1, Period 2)", y=" ", color="Analysis approach:") +
+  new_scale_color() +
+  geom_vline(aes(xintercept = p_a2, color = OR_RR_RD), linetype = "dashed") +
+  labs(color="") +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(OR_1 ~ hypothesis_1, scales = "free", 
+             labeller = labeller(hypothesis_1  = as_labeller(hypothesis_1_names),
+                                 OR_1  = as_labeller(OR1_names))) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+ggsave("figures_transposed/bin_step_diff_neg_pow_alpha_supp_t.png", width = 10, height = 6)
+```
+
+
+```{r}
+results_bin_diff_lin <- rbind(results_bin_lin_mult_alpha_diff_neg,
+                              results_bin_lin_mult_pow_diff_neg,
+                              results_bin_lin_mult_alpha_OR1_diff_neg,
+                              results_bin_lin_mult_pow_OR1_diff_neg,
+                              results_bin_lin_mult_alpha_diff_pos,
+                              results_bin_lin_mult_pow_diff_pos,
+                              results_bin_lin_mult_alpha_OR1_diff_pos,
+                              results_bin_lin_mult_pow_OR1_diff_pos) %>%
+  mutate(scenario = factor(case_when(trend_param=="add" & lambda0 >=0 ~ "add_pos",
+                                     trend_param=="add" & lambda0 <0 ~ "add_neg",
+                                     trend_param=="mult" & lambda0 >=0 ~ "mult_pos",
+                                     trend_param=="mult" & lambda0 <0 ~ "mult_neg"),
+                           levels = c("add_neg", "add_pos", "mult_neg", "mult_pos")))  %>%
+  
+  mutate(p_0 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + lambda0))),
+                         trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + lambda0*((n0+n1+n22)-1)/((n0+n1+n22)-1))))), # P_control 2nd period
+         
+         p_1 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1) + lambda1))),
+                         trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1) + lambda1*((n0+n1+n22)-1)/((n0+n1+n22)-1))))), # P_t1 2nd period
+         
+         p_2 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR2) + lambda2))),
+                         trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR2) + lambda2*((n0+n1+n22)-1)/((n0+n1+n22)-1))))), # P_t2 2nd period
+         
+         p1 = case_when(trend_param=="mult" & trend=="stepwise" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1)))),
+                        trend_param=="mult" & trend=="linear" ~ 1 / (1 + exp(-(log(p0/(1-p0)) + log(OR1) + lambda1*(1)/((n0+n1+n22)-1)))))) # P_t1 1st period
+
+
+results_bin_diff_lin <- results_bin_diff_lin %>%
+  mutate(p_a2_OR = get_OR_RR_RD(p_c1 = results_bin_diff_lin$p0, p_c2 = results_bin_diff_lin$p_0, p_a1 = results_bin_diff_lin$p1)$p_a2_OR,
+         p_a2_RR = get_OR_RR_RD(p_c1 = results_bin_diff_lin$p0, p_c2 = results_bin_diff_lin$p_0, p_a1 = results_bin_diff_lin$p1)$p_a2_RR,
+         p_a2_RD = get_OR_RR_RD(p_c1 = results_bin_diff_lin$p0, p_c2 = results_bin_diff_lin$p_0, p_a1 = results_bin_diff_lin$p1)$p_a2_RD,
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+```{r}
+results_bin_diff_inv_1 <- rbind(results_bin_inv_1_mult_alpha_diff_neg,
+                                results_bin_inv_1_mult_pow_diff_neg,
+                                results_bin_inv_1_mult_alpha_OR1_diff_neg,
+                                results_bin_inv_1_mult_pow_OR1_diff_neg,
+                                results_bin_inv_1_mult_alpha_diff_pos,
+                                results_bin_inv_1_mult_pow_diff_pos,
+                                results_bin_inv_1_mult_alpha_OR1_diff_pos,
+                                results_bin_inv_1_mult_pow_OR1_diff_pos) %>%
+  mutate(scenario = factor(case_when(trend_param=="add" & lambda0 >=0 ~ "add_pos",
+                                     trend_param=="add" & lambda0 <0 ~ "add_neg",
+                                     trend_param=="mult" & lambda0 >=0 ~ "mult_pos",
+                                     trend_param=="mult" & lambda0 <0 ~ "mult_neg"),
+                           levels = c("add_neg", "add_pos", "mult_neg", "mult_pos")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+```{r}
+results_bin_diff_inv_2 <- rbind(results_bin_inv_2_mult_alpha_diff_neg,
+                                results_bin_inv_2_mult_pow_diff_neg,
+                                results_bin_inv_2_mult_alpha_OR1_diff_neg,
+                                results_bin_inv_2_mult_pow_OR1_diff_neg,
+                                results_bin_inv_2_mult_alpha_diff_pos,
+                                results_bin_inv_2_mult_pow_diff_pos,
+                                results_bin_inv_2_mult_alpha_OR1_diff_pos,
+                                results_bin_inv_2_mult_pow_OR1_diff_pos) %>%
+  mutate(scenario = factor(case_when(trend_param=="add" & lambda0 >=0 ~ "add_pos",
+                                     trend_param=="add" & lambda0 <0 ~ "add_neg",
+                                     trend_param=="mult" & lambda0 >=0 ~ "mult_pos",
+                                     trend_param=="mult" & lambda0 <0 ~ "mult_neg"),
+                           levels = c("add_neg", "add_pos", "mult_neg", "mult_pos")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+```{r}
+results_bin_diff_inv_3 <- rbind(results_bin_inv_3_mult_alpha_diff_neg,
+                                results_bin_inv_3_mult_pow_diff_neg,
+                                results_bin_inv_3_mult_alpha_OR1_diff_neg,
+                                results_bin_inv_3_mult_pow_OR1_diff_neg,
+                                results_bin_inv_3_mult_alpha_diff_pos,
+                                results_bin_inv_3_mult_pow_diff_pos,
+                                results_bin_inv_3_mult_alpha_OR1_diff_pos,
+                                results_bin_inv_3_mult_pow_OR1_diff_pos) %>%
+  mutate(scenario = factor(case_when(trend_param=="add" & lambda0 >=0 ~ "add_pos",
+                                     trend_param=="add" & lambda0 <0 ~ "add_neg",
+                                     trend_param=="mult" & lambda0 >=0 ~ "mult_pos",
+                                     trend_param=="mult" & lambda0 <0 ~ "mult_neg"),
+                           levels = c("add_neg", "add_pos", "mult_neg", "mult_pos")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+```{r}
+results_bin_diff <- rbind(results_bin_diff_step %>% select(-c(p_0, p_1, p_2, p1, p_a2_OR, p_a2_RR, p_a2_RD)),
+                          results_bin_diff_lin %>% select(-c(p_0, p_1, p_2, p1, p_a2_OR, p_a2_RR, p_a2_RD)),
+                          results_bin_diff_inv_1 %>% select(-N_peak),
+                          results_bin_diff_inv_2 %>% select(-N_peak),
+                          results_bin_diff_inv_3 %>% select(-N_peak))
+```
+
+
+## T1E / Power
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_bin_diff) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol"), scenario=="mult_pos", trend %in% c("linear", "stepwise", "inv_u_3"), hypothesis %in% c("H0", "H0_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Type I error") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")),
+          
+          ggplot(get_data_plot(results_bin_diff) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol"), scenario=="mult_pos", trend %in% c("linear", "stepwise", "inv_u_3"), hypothesis %in% c("H1", "H1_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Power") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")),
+          
+          common.legend = T, legend = "bottom")
+
+ggsave("figures_transposed/bin_all_diff_pos_pow_alpha_main_t.png", width = 10, height = 10)
+```
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_pos", hypothesis %in% c("H0", "H0_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Type I error") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_pos", hypothesis %in% c("H1", "H1_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Power") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          common.legend = T, legend = "bottom")
+  
+ggsave("figures_transposed/bin_all_diff_pos_pow_alpha_supp_t.png", width = 9, height = 10)
+```
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate (OR1<1)", H1="Power (OR1<1)", H0_1="Type I error rate (OR1>1)", H1_1="Power (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_neg", hypothesis %in% c("H0", "H0_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Type I error") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_neg", hypothesis %in% c("H1", "H1_1"))) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Power") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          common.legend = T, legend = "bottom")
+  
+ggsave("figures_transposed/bin_all_diff_neg_pow_alpha_supp_t.png", width = 9, height = 10)
+```
+
+## Bias
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_pos")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures_transposed/bin_all_diff_pos_bias_supp_t.png", width = 9, height = 10)
+```
+
+## rMSE
+
+```{r, fig.width=9, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis (OR1<1)", H1="Alternative hypothesis (OR1<1)", H0_1="Null hypothesis (OR1>1)", H1_1="Alternative hypothesis (OR1>1)")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_bin_diff) %>% filter(model!="zsep" & model!="zpol", scenario=="mult_pos")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures_transposed/bin_all_diff_pos_rmse_supp_t.png", width = 9, height = 10)
+```
+
+
+# Continuous endpoints - equal time trends
+
+```{r}
+results_cont_eq <- rbind(results_cont_lin_alpha_eq,
+                         results_cont_lin_pow_eq,
+                         results_cont_step_alpha_eq,
+                         results_cont_step_pow_eq,
+                         results_cont_inv_1_alpha_eq %>% select(-N_peak),
+                         results_cont_inv_1_pow_eq %>% select(-N_peak),
+                         results_cont_inv_2_alpha_eq %>% select(-N_peak),
+                         results_cont_inv_2_pow_eq %>% select(-N_peak),
+                         results_cont_inv_3_alpha_eq %>% select(-N_peak),
+                         results_cont_inv_3_pow_eq %>% select(-N_peak)) %>%
+  mutate(scenario = factor(case_when(trend=="linear" & lambda1 >=0 ~ "lin_pos_diff",
+                                     trend=="linear" & lambda1 <0 ~ "lin_neg_diff",
+                                     trend=="stepwise" & lambda1 >=0 ~ "step_pos_diff",
+                                     trend=="stepwise" & lambda1 <0 ~ "step_neg_diff",
+                                     trend=="inv_u_1" & lambda1 >=0 ~ "inv_u_1_pos_diff",
+                                     trend=="inv_u_1" & lambda1 <0 ~ "inv_u_1_neg_diff",
+                                     trend=="inv_u_2" & lambda1 >=0 ~ "inv_u_2_pos_diff",
+                                     trend=="inv_u_2" & lambda1 <0 ~ "inv_u_2_neg_diff",
+                                     trend=="inv_u_3" & lambda1 >=0 ~ "inv_u_3_pos_diff",
+                                     trend=="inv_u_3" & lambda1 <0 ~ "inv_u_3_neg_diff")),
+         alpha = ifelse(hypothesis=="H0", 0.025, NA))
+```
+
+
+## T1E / Power
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol", hypothesis=="H0")) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Type I error") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol", hypothesis=="H1")) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Power") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")),
+          
+          common.legend = T, legend = "bottom")
+
+ggsave("figures_transposed/cont_all_eq_pow_alpha_supp_t.png", width = 7, height = 10)
+```
+
+## Bias
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures_transposed/cont_all_eq_bias_supp_t.png", width = 7, height = 10)
+```
+
+## rMSE
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_cont_eq) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+  
+ggsave("figures_transposed/cont_all_eq_rmse_supp_t.png", width = 7, height = 10)
+```
+
+
+
+# Continuous endpoints - different trends
+
+
+```{r}
+results_cont_diff <- rbind(results_cont_lin_alpha_diff,
+                           results_cont_lin_pow_diff,
+                           results_cont_step_alpha_diff,
+                           results_cont_step_pow_diff,
+                           results_cont_inv_1_alpha_diff %>% select(-N_peak),
+                           results_cont_inv_1_pow_diff %>% select(-N_peak),
+                           results_cont_inv_2_alpha_diff %>% select(-N_peak),
+                           results_cont_inv_2_pow_diff %>% select(-N_peak),
+                           results_cont_inv_3_alpha_diff %>% select(-N_peak),
+                           results_cont_inv_3_pow_diff %>% select(-N_peak)) %>%
+  mutate(scenario = factor(case_when(trend=="linear" & lambda1 >=0 ~ "lin_pos_diff",
+                                     trend=="linear" & lambda1 <0 ~ "lin_neg_diff",
+                                     trend=="stepwise" & lambda1 >=0 ~ "step_pos_diff",
+                                     trend=="stepwise" & lambda1 <0 ~ "step_neg_diff",
+                                     trend=="inv_u_1" & lambda1 >=0 ~ "inv_u_1_pos_diff",
+                                     trend=="inv_u_1" & lambda1 <0 ~ "inv_u_1_neg_diff",
+                                     trend=="inv_u_2" & lambda1 >=0 ~ "inv_u_2_pos_diff",
+                                     trend=="inv_u_2" & lambda1 <0 ~ "inv_u_2_neg_diff",
+                                     trend=="inv_u_3" & lambda1 >=0 ~ "inv_u_3_pos_diff",
+                                     trend=="inv_u_3" & lambda1 <0 ~ "inv_u_3_neg_diff")))
+
+results_cont_diff <- results_cont_diff %>%
+  mutate(mu_0 = case_when(trend=="stepwise" ~ mu0 + lambda0,
+                          trend=="linear" ~ lambda0*((n0+n1+n22)-1)/((n0+n1+n22)-1)),
+         mu_1 = case_when(trend=="stepwise" ~ delta1 + lambda1,
+                          trend=="linear" ~ delta1 + lambda1*((n0+n1+n22)-1)/((n0+n1+n22)-1)),
+         mu_2 = case_when(trend=="stepwise" ~ delta2 + lambda2,
+                          trend=="linear" ~ delta2 + lambda2*((n0+n1+n22)-1)/((n0+n1+n22)-1)),
+         alpha = ifelse(hypothesis=="H0", 0.025, NA))
+```
+
+## T1E / Power
+
+```{r, fig.width=7, fig.height=6}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot_mu(results_cont_diff) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"), trend=="stepwise", hypothesis=="H0")) +
+            #geom_point(aes(mu_1, reject_h02, color=model)) +
+            geom_line(aes(mu_1, reject_h02, color=model), size=1) +
+            labs(x=TeX(" "), y=" ", color="Analysis approach:") +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(hypothesis ~ trend, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend  = as_labeller(trend_names))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")),
+          
+          ggplot(get_data_plot_mu(results_cont_diff) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"), trend=="stepwise", hypothesis=="H1")) +
+            #geom_point(aes(mu_1, reject_h02, color=model)) +
+            geom_line(aes(mu_1, reject_h02, color=model), size=1) +
+            labs(x=TeX("$X=\\mu_{Arm 1, Period 2}$"), y=" ", color="Analysis approach:") +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(hypothesis ~ trend, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend  = as_labeller(trend_names))) +
+            theme_bw() +
+            theme(legend.position = "bottom",
+                  strip.text.x = element_blank()) +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")),
+          
+          common.legend = T, ncol = 1, legend = "bottom")
+
+ggsave("figures_transposed/cont_step_diff_pow_alpha_main_t.png", width = 7, height = 6)
+```
+
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_cont_diff) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"), trend %in% c("linear", "stepwise", "inv_u_3"), hypothesis=="H0")) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Type I error") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")) +
+  scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)),
+  
+  ggplot(get_data_plot(results_cont_diff) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"), trend %in% c("linear", "stepwise", "inv_u_3"), hypothesis=="H1")) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Power") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach")) +
+  scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)),
+  
+  common.legend = T, legend = "bottom")
+  
+ggsave("figures_transposed/cont_all_diff_pow_alpha_main_t.png", width = 7, height = 10)
+```
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggarrange(ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol", hypothesis=="H0")) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Type I error") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
+            scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)),
+          
+          ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol", hypothesis=="H1")) +
+            #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+            geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+            geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+            facet_grid(trend ~ hypothesis, scales = "free", 
+                       labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                           trend = as_labeller(trend_names, label_parsed))) +
+            theme_bw() +
+            theme(legend.position = "bottom") +
+            labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Power") +
+            scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
+            scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05)),
+          
+          common.legend = T, legend = "bottom")
+  
+ggsave("figures_transposed/cont_all_diff_pow_alpha_supp_t.png", width = 7, height = 10)
+```
+
+## Bias
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
+  scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05))
+  
+ggsave("figures_transposed/cont_all_diff_bias_supp_t.png", width = 7, height = 10)
+```
+
+## rMSE
+
+```{r, fig.width=7, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+trend_names <- c(linear = "Linear", stepwise = "Stepwise", inv_u_1 = "Inverted-U (N[p] == 125)", inv_u_2 = "Inverted-U (N[p] == 250)", inv_u_3 = "Inverted-U (N[p] == 500)")
+
+ggplot(get_data_plot(results_cont_diff) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(trend ~ hypothesis, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 trend = as_labeller(trend_names, label_parsed))) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) +
+  scale_x_continuous(breaks = seq(-0.05, 0.25, by=0.05), labels = seq(-0.05, 0.25, by=0.05))
+  
+ggsave("figures_transposed/cont_all_diff_rmse_supp_t.png", width = 7, height = 10)
+```
+
+
+
+# Response over time
+
+- $\lambda_0=\lambda_1=\lambda_2 = 0.15$
+
+```{r}
+results_cont_eq_step_lin <- rbind(results_cont_lin_alpha_eq %>% mutate(scenario="Linear trend"),
+                                  results_cont_lin_pow_eq %>% mutate(scenario="Linear trend"),
+                                  results_cont_step_alpha_eq %>% mutate(scenario="Stepwise trend"),
+                                  results_cont_step_pow_eq %>% mutate(scenario="Stepwise trend"))
+
+response_cont <- results_cont_eq_step_lin %>%
+  filter(lambda1==0.15)
+
+response_cont_plot <- NULL
+for (i in 1:nrow(response_cont)) {
+  data_ <- data_sim_block(K=response_cont$K[i],mu0=response_cont$mu0[i],
+                          delta=c(response_cont$delta1[i],response_cont$delta2[i]),
+                          lambda=c(response_cont$lambda0[i],response_cont$lambda1[i],response_cont$lambda2[i]),
+                          sigma=response_cont$sigma[i],
+                          N1=c(response_cont$n01[i],response_cont$n11[i]),
+                          N2=c(response_cont$n02[i],response_cont$n12[i]),
+                          N_add=response_cont$n22[i],
+                          trend = response_cont$trend[i],
+                          endpoint = response_cont$endpoint[i]) %>%
+    mutate(hypothesis = response_cont$hypothesis[i],
+           scenario = response_cont$scenario[i])
+  
+  response_cont_plot <- rbind(response_cont_plot, data_)
+}
+
+results_cont_eq_inv <- rbind(results_cont_inv_1_alpha_eq %>% mutate(trend="inv_u", scenario="Inverted U-1 trend"),
+                             results_cont_inv_1_pow_eq %>% mutate(trend="inv_u", scenario="Inverted U-1 trend"),
+                             results_cont_inv_2_alpha_eq %>% mutate(trend="inv_u", scenario="Inverted U-2 trend"),
+                             results_cont_inv_2_pow_eq %>% mutate(trend="inv_u", scenario="Inverted U-2 trend"),
+                             results_cont_inv_3_alpha_eq %>% mutate(trend="inv_u", scenario="Inverted U-3 trend"),
+                             results_cont_inv_3_pow_eq %>% mutate(trend="inv_u", scenario="Inverted U-3 trend"))
+
+response_cont <- results_cont_eq_inv %>%
+  filter(lambda1==0.15)
+
+for (i in 1:nrow(response_cont)) {
+  data_ <- data_sim_block(K=response_cont$K[i], mu0=response_cont$mu0[i],
+                          delta=c(response_cont$delta1[i],response_cont$delta2[i]),
+                          lambda=c(response_cont$lambda0[i],response_cont$lambda1[i],response_cont$lambda2[i]),
+                          sigma=response_cont$sigma[i],
+                          N1=c(response_cont$n01[i],response_cont$n11[i]),
+                          N2=c(response_cont$n02[i],response_cont$n12[i]),
+                          N_add=response_cont$n22[i],
+                          N_peak=response_cont$N_peak[i],
+                          trend = response_cont$trend[i],
+                          endpoint = response_cont$endpoint[i]) %>%
+    mutate(hypothesis = response_cont$hypothesis[i],
+           scenario = response_cont$scenario[i])
+  
+  response_cont_plot <- rbind(response_cont_plot, data_)
+}
+```
+
+```{r, fig.width=5, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+scenario_names <- c(`Linear trend` = "Linear", `Stepwise trend` = "Stepwise", `Inverted U-1 trend` = "Inverted-U (N[p] == 125)", `Inverted U-2 trend` = "Inverted-U (N[p] == 250)", `Inverted U-3 trend` = "Inverted-U (N[p] == 500)")
+
+ggplot(response_cont_plot) +
+  geom_point(aes(j, means, color=as.factor(treatment))) +
+  facet_grid(scenario ~ hypothesis, 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 scenario = as_labeller(scenario_names, label_parsed))) +
+  theme_bw() +
+  scale_color_lancet() +
+  labs(x="Patient recruitment", y="Means", color="Treatment")
+  
+ggsave("figures_transposed/cont_response_main_t.png", width = 5, height = 10)
+```
+
+
+
+
