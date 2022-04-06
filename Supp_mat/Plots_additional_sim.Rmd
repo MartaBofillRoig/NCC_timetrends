@@ -1,0 +1,556 @@
+---
+title: "Model-based time trend adjustments in platform trials with NCC - additional simulations"
+author: ""
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: hide 
+    theme: readable
+    # journal, readable, paper 
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(latex2exp)
+library(ggpubr)
+library(ggnewscale)
+library(RColorBrewer)
+library(ggsci)
+library(scales)
+
+source("functions/linear_model.R")
+source("functions/log_model.R")
+source("functions/z_test.R")
+source("functions/t_test.R")
+source("functions/z_prop_test.R")
+source("functions/trend_functions.R")
+source("functions/data_sim_block.R")
+source("functions/allinone_model.R")
+source("functions/allinone_sim.R")
+source("functions/allinone_sim_par.R")
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>")
+```
+
+```{r}
+# Load data
+
+# Binary linear equal
+results_bin_lin_mult_alpha_OR1_eq_2 <- read_csv("results/results_bin_lin_mult_alpha_OR1_eq_2.csv")
+results_bin_lin_mult_pow_OR1_eq_2 <- read_csv("results/results_bin_lin_mult_pow_OR1_eq_2.csv")
+
+# Binary linear different, negative trend in control
+results_bin_lin_mult_alpha_OR1_diff_neg_2 <- read_csv("results/results_bin_lin_mult_alpha_OR1_diff_neg_2.csv")
+results_bin_lin_mult_pow_OR1_diff_neg_2 <- read_csv("results/results_bin_lin_mult_pow_OR1_diff_neg_2.csv")
+
+# Binary linear different, positive trend in control
+results_bin_lin_mult_alpha_OR1_diff_pos_2 <- read_csv("results/results_bin_lin_mult_alpha_OR1_diff_pos_2.csv")
+results_bin_lin_mult_pow_OR1_diff_pos_2 <- read_csv("results/results_bin_lin_mult_pow_OR1_diff_pos_2.csv")
+
+
+
+# Continuous linear equal
+results_cont_lin_alpha_eq_2 <- read_csv("results/results_cont_lin_alpha_eq_2.csv")
+results_cont_lin_pow_eq_2 <- read_csv("results/results_cont_lin_pow_eq_2.csv")
+
+# Continuous linear different
+results_cont_lin_alpha_diff_2 <- read_csv("results/results_cont_lin_alpha_diff_2.csv")
+results_cont_lin_pow_diff_2 <- read_csv("results/results_cont_lin_pow_diff_2.csv")
+```
+
+
+
+```{r}
+my_palette = c("#ED0000FF",
+               "#925E9FFF",
+               "#00468BFF",
+               "#42B540FF",
+               "#EEAD0E",
+               "#0099B4FF",
+               "#FDAF91FF",
+               "#ADB6B6FF",
+               "#1B1919FF")
+
+#show_col(my_palette)
+```
+
+
+```{r}
+# Functions
+
+get_data_plot <- function(data_csv){
+  
+  data_reject <- data_csv %>%
+    select(c(1:21, starts_with("reject"), scenario, alpha)) %>%
+    pivot_longer(cols = starts_with("reject"),
+                 names_to = c("model"),
+                 names_prefix = "reject_h02_",
+                 values_to = "reject_h02")
+  
+  data_rMSE <- data_csv %>%
+    select(c(1:21, starts_with("rMSE"), scenario, alpha)) %>%
+    pivot_longer(cols = starts_with("rMSE"),
+                 names_to = c("model"),
+                 names_prefix = "rMSE_",
+                 values_to = "rMSE")
+  
+  data_bias <- data_csv %>%
+    select(c(1:21, starts_with("bias"), scenario, alpha)) %>%
+    pivot_longer(cols = starts_with("bias"),
+                 names_to = c("model"),
+                 names_prefix = "bias_",
+                 values_to = "bias")
+  
+  data_plot <- data_reject %>%
+    left_join(data_rMSE) %>%
+    left_join(data_bias)
+  
+  data_plot
+}
+```
+
+
+
+```{r}
+results_bin_eq_lin <- rbind(results_bin_lin_mult_alpha_OR1_eq_2,
+                            results_bin_lin_mult_pow_OR1_eq_2) %>%
+  mutate(scenario = factor(case_when(lambda0 >=0 ~ "pos",
+                                     lambda0 <0 ~ "neg")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+
+results_bin_diff_lin <- rbind(results_bin_lin_mult_alpha_OR1_diff_neg_2,
+                              results_bin_lin_mult_pow_OR1_diff_neg_2,
+                              results_bin_lin_mult_alpha_OR1_diff_pos_2,
+                              results_bin_lin_mult_pow_OR1_diff_pos_2) %>%
+  mutate(scenario = factor(case_when(lambda0 >=0 ~ "pos",
+                                     lambda0 <0 ~ "neg")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+```{r}
+results_cont_eq_lin <- rbind(results_cont_lin_alpha_eq_2,
+                             results_cont_lin_pow_eq_2) %>%
+  mutate(scenario = factor(case_when(lambda0 >=0 ~ "pos",
+                                     lambda0 <0 ~ "neg")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+
+results_cont_diff_lin <- rbind(results_cont_lin_alpha_diff_2,
+                               results_cont_lin_pow_diff_2) %>%
+  mutate(scenario = factor(case_when(lambda0 >=0 ~ "pos",
+                                     lambda0 <0 ~ "neg")),
+         alpha = ifelse(hypothesis %in% c("H0", "H0_1"), 0.025, NA))
+```
+
+
+# Binary endpoint - equal trend
+
+
+## T1E / Power
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Type I error rate", H1_1="Power")
+
+ggplot(get_data_plot(results_bin_eq_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Type I error rate", H1_1="Power")
+
+ggplot(get_data_plot(results_bin_eq_lin) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol"))) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+
+## Bias
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Null hypothesis ", H1_1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_bin_eq_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Null hypothesis ", H1_1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_bin_eq_lin) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol"))) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+## rMSE
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Null hypothesis ", H1_1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_bin_eq_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Null hypothesis ", H1_1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_bin_eq_lin) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol"))) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+# Binary endpoint - different trends
+
+## T1E / Power
+
+```{r, fig.width=10, fig.height=8}
+hypothesis_names <- c(H0_1="Type I error rate", H1_1="Power")
+scenario_names <- c(neg="Negative trend in control", pos="Positive trend in control")
+
+ggplot(get_data_plot(results_bin_diff_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(hypothesis ~ scenario, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 scenario  = as_labeller(scenario_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+### Positive trend in control
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Type I error rate", H1_1="Power")
+
+ggplot(get_data_plot(results_bin_diff_lin) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol") & 
+                                                                     scenario %in% c("pos"))) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+
+ggsave("figures/bin_diff_pow_alpha_pos_rev.png", width = 10, height = 10)
+```
+
+### Negative trend in control
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0_1="Type I error rate", H1_1="Power")
+
+ggplot(get_data_plot(results_bin_diff_lin) %>% filter(model %in% c("a2", "a2_int", "log_sep", "log_pol") & 
+                                                                     scenario %in% c("neg"))) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+
+ggsave("figures/bin_diff_pow_alpha_neg_rev.png", width = 10, height = 10)
+```
+
+
+## Bias
+
+```{r, fig.width=10, fig.height=8}
+hypothesis_names <- c(H0_1="Null hypothesis ", H1_1="Alternative hypothesis")
+scenario_names <- c(neg="Negative trend in control", pos="Positive trend in control")
+
+ggplot(get_data_plot(results_bin_diff_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(hypothesis ~ scenario, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 scenario  = as_labeller(scenario_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+
+
+## rMSE
+
+```{r, fig.width=10, fig.height=8}
+hypothesis_names <- c(H0_1="Null hypothesis ", H1_1="Alternative hypothesis")
+scenario_names <- c(neg="Negative trend in control", pos="Positive trend in control")
+
+ggplot(get_data_plot(results_bin_diff_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(hypothesis ~ scenario, scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names),
+                                 scenario  = as_labeller(scenario_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+
+# Continuous endpoint - equal time trends
+
+## T1E / Power
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+
+ggplot(get_data_plot(results_cont_eq_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+
+ggplot(get_data_plot(results_cont_eq_lin) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"))) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+## Bias
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_cont_eq_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) 
+```
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_cont_eq_lin) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"))) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+## rMSE
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis ", H1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_cont_eq_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+#schemes_names <- c(`1`="N_1 = n/2", `2`="N_1 = n", `3` = "N_1 = 3n/2")
+
+ggplot(get_data_plot(results_cont_eq_lin) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"))) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+# Continuous endpoints - different trends
+
+
+## T1E / Power
+
+```{r, fig.width=10, fig.height=9}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+
+ggplot(get_data_plot(results_cont_diff_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) 
+```
+
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Type I error rate", H1="Power")
+
+ggplot(get_data_plot(results_cont_diff_lin) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"))) +
+  #geom_point(aes(lambda1, reject_h02, color=as.factor(model))) +
+  geom_line(aes(lambda1, reject_h02, color=as.factor(model)), size=1) +
+  geom_hline(aes(yintercept = alpha), linetype = "dashed") +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y=" ") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+
+ggsave("figures/cont_diff_pow_alpha_rev.png", width = 10, height = 10)
+```
+
+## Bias
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis ", H1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_cont_diff_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach")) 
+```
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+ggplot(get_data_plot(results_cont_diff_lin) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"))) +
+  #geom_point(aes(lambda1, bias, color=as.factor(model))) +
+  geom_line(aes(lambda1, bias, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="Bias") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+## rMSE
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis ", H1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_cont_diff_lin) %>% filter(model!="zsep" & model!="zpol")) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Linear", "ALLTCI-Linear", "ALLTC-Step", "ALLTCI-Step", "TC-Linear", "TC-Step", "Pooled approach", "Separate approach"))
+```
+
+```{r, fig.width=10, fig.height=10}
+hypothesis_names <- c(H0="Null hypothesis", H1="Alternative hypothesis")
+
+ggplot(get_data_plot(results_cont_diff_lin) %>% filter(model %in% c("a2", "a2_int", "tsep", "tpol"))) +
+  #geom_point(aes(lambda1, rMSE, color=as.factor(model))) +
+  geom_line(aes(lambda1, rMSE, color=as.factor(model)), size=1) +
+  facet_grid(rows = vars(hypothesis), scales = "free", 
+             labeller = labeller(hypothesis  = as_labeller(hypothesis_names))) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(x=TeX("$\\lambda_1$"), color="Analysis approach:", y="rMSE") +
+  scale_color_manual(values = my_palette, labels = c("ALLTC-Step", "ALLTCI-Step", "Pooled approach", "Separate approach"))
+```
+
+
+
