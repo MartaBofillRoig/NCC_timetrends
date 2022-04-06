@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This repository contains the main code and R functions to reproduce the results of the simulation study in ``On model-based time trend adjustments in platform trials with non-concurrent controls'' (https://arxiv.org/abs/2112.06574).
 
-We investigated frequentist, model-based approaches to adjust for time trends in platform trials utilizing non-concurrent controls. We investigated conditions under which the model-based approaches can successfully adjust for time trends for the simple case of a two-period trial with two experimental treatments and a shared control. We focus on a platform trial  with two treatment arms and a common control arm. Assuming that the second treatment arm is added at a later time period, we assess  the robustness of recently proposed model-based approaches  to adjust for time trends when utilizing non-concurrent controls. The following figure illustrates the design considered:
+We investigated frequentist, model-based approaches to adjust for time trends in platform trials utilizing non-concurrent controls. We investigated conditions under which the model-based approaches can successfully adjust for time trends in the simple case of a two-period trial with two experimental treatments and a shared control. Assuming that the second treatment arm is added at a later time period, we assess the robustness of recently proposed model-based approaches to adjust for time trends when utilizing non-concurrent controls. The following figure illustrates the design considered:
 
 
 ![Image Title](./figures/trial_scheme.png){width=30%}
@@ -58,7 +58,7 @@ The folder _functions_ contains all R functions necessary to reproduce the resul
 
 ## Main simulation script and results
 
-- **mainpaper_script.R**: Script with all scenarios considered in the study. Simulates given scenarios and saves the results as .csv files in the folder _results_. 
+- **mainpaper_script.R**: Script with all scenarios considered in the main study. Simulates given scenarios and saves the results as .csv files in the folder _results_. 
 
 Running this script results in 100 separate .csv files, named **results_bin_trendpattern_parametrization_hypothesis_trendtype.csv** or **results_cont_trendpattern_hypothesis_trendtype.csv** depending on whether the simulated data were binary or continuous.
 
@@ -115,16 +115,21 @@ Running this script results in 100 separate .csv files, named **results_bin_tren
 
 
 
+# Figures
+
+- **Plots_paper.Rmd**: generates all figures used in the main paper and section E of the supplementary material and saves them in the folder _figures_. 
+
+Figures presented in the main paper have the suffix **\_main** (e.g. **cont_response_main.png**), while figures included in the supplementary material are indicated by the suffix **\_supp** (e.g. **cont_all_eq_bias_supp.png**).
+
 
 # Supplementary material 
 
-The folder _Supp\_mat_ contains additional results regarding different randomization procedures discussed in the Supplementary material. Results that are reported in Section 3 of the Supplementary material are simulated in the ``Supp_mat_randomization.Rmd`` script and presented in the corresponding HTML file.
+The folder _Supp\_mat_ contains additional simulation results for three-stage platform trials and additional results regarding different randomization procedures discussed in the supplementary material.
 
-# Figures
+Results that are reported in section F.1 of the supplementary material are simulated in the **Supp_mat_randomization.Rmd** script and presented in the corresponding HTML file.
 
-- **Plots_paper.Rmd**: generates all figures used in the main paper and supplementary material and saves them in the folder _figures_. 
+For section F.2 of the supplementary material (platform trials with three periods), there are analogous functions as for the main paper in the subfolder _functions_, which were adapted for the three-stage design. All considered three-stage scenarios can be simulated by running the **additional_sim_script.R**, while the results are again saved in the _results_ subfolder. The files **Plots_additional_sim.Rmd** and the corresponding HTML file are used for visualization of the additional results. Figures presented in Section F.2 of the Supplementary material are saved in the _figures_ subfolder.
 
-Figures presented in the main paper have the suffix **\_main** (e.g. **cont_response_main.png**), while figures included in the supplementary material are indicated by the suffix **\_supp** (e.g. **cont_all_eq_bias_supp.png**).
 
 ---
 
