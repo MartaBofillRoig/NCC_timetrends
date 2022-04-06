@@ -8,12 +8,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-This repository contains the main code and R functions to reproduce the results of the simulation study in ``On model-based time trend adjustments in platform trials with non-concurrent controls'' (https://arxiv.org/abs/2112.06574).
+This repository contains the main code and R functions to reproduce the results of the simulation study in **"On model-based time trend adjustments in platform trials with non-concurrent controls"** (https://arxiv.org/abs/2112.06574).
 
 We investigated frequentist, model-based approaches to adjust for time trends in platform trials utilizing non-concurrent controls. We investigated conditions under which the model-based approaches can successfully adjust for time trends in the simple case of a two-period trial with two experimental treatments and a shared control. Assuming that the second treatment arm is added at a later time period, we assess the robustness of recently proposed model-based approaches to adjust for time trends when utilizing non-concurrent controls. The following figure illustrates the design considered:
 
 
-![Image Title](./figures/trial_scheme.png){width=30%}
+![ ](./figures/trial_scheme.png){width=30%}
 
 Next, we explain the R functions we created to simulate the data and to analyse it. After this, we describe the main simulation script and results and briefly summarize the supplementary material and the figures created.
 

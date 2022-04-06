@@ -3,8 +3,8 @@ non-concurrent controls
 ================
 
 This repository contains the main code and R functions to reproduce the
-results of the simulation study in \`\`On model-based time trend
-adjustments in platform trials with non-concurrent controls’’
+results of the simulation study in **“On model-based time trend
+adjustments in platform trials with non-concurrent controls”**
 (<https://arxiv.org/abs/2112.06574>).
 
 We investigated frequentist, model-based approaches to adjust for time
@@ -17,11 +17,7 @@ the robustness of recently proposed model-based approaches to adjust for
 time trends when utilizing non-concurrent controls. The following figure
 illustrates the design considered:
 
-<figure>
-<img src="./figures/trial_scheme.png" style="width:30.0%"
-alt="Image Title" />
-<figcaption aria-hidden="true">Image Title</figcaption>
-</figure>
+<img src="./figures/trial_scheme.png" style="width:30.0%" />
 
 Next, we explain the R functions we created to simulate the data and to
 analyse it. After this, we describe the main simulation script and
