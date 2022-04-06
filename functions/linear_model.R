@@ -1,4 +1,3 @@
-
 ######################################################################################################################################
 
 # Linear model M_a1 (ALLTC-Linear) - using all data to estimate effects of all treatments + effect of continuous recruitment
@@ -44,7 +43,7 @@ linear_model_a2 <- function(data, delta, alpha=0.025){
 # Linear model M_b1 (TC-Linear) - using only control data (both stages) and newly added arm to estimate the effect of new treatment only + effect of continuous recruitment
 
 linear_model_b1 <- function(data, delta, alpha=0.025){
-  #data <- data %>% filter(treatment %in% c(0, max(treatment)))
+  
   data <- data[data$treatment %in% c(0, 2),]
   
   # fit linear model
@@ -66,7 +65,7 @@ linear_model_b1 <- function(data, delta, alpha=0.025){
 # Linear model M_b2 (TC-Step) - using only control data (both stages) and newly added arm to estimate the effect of new treatment only + stage effect
 
 linear_model_b2 <- function(data, delta, alpha=0.025){
-  #data <- data %>% filter(treatment %in% c(0, max(treatment)))
+  
   data <- data[data$treatment %in% c(0, 2),]
   
   # fit linear model

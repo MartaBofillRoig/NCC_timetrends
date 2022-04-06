@@ -1,4 +1,5 @@
-#
+#######################################################################################################################################
+
 data_sim_block <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_add, N_peak, trend, trend_param, endpoint){
   N1<-round(N1)
   N2<-round(N2)
@@ -105,7 +106,7 @@ data_sim_block <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_a
                        means = mu0+means)
   }
   
-  # Simulation of binary endpoint (with different possible parametrization of the time trend)
+  # Simulation of binary endpoint (with different possible parametrizations of the time trend)
   
   if(endpoint=="binary"){
     
@@ -120,11 +121,7 @@ data_sim_block <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_a
       p[j1] <- 1 / (1 + exp(-eta1))
       p[j2] <- 1 / (1 + exp(-eta2))
       
-      # p[j0][N1[1]]
-      # p[j0][N1[1]+1]
-      
-      (OR_inf1 = (p[j2][1]/(1-p[j2][1]))/(p[j0][N1[1]]/(1-p[j0][N1[1]])))
-      (OR_inf2 = (p[j2][1]/(1-p[j2][1]))/(p[j0][N1[1]+1]/(1-p[j0][N1[1]+1])))
+      OR_inf2 <- (p[j2][1]/(1-p[j2][1]))/(p[j0][N1[1]+1]/(1-p[j0][N1[1]+1])) # time dependent OR2
     }
     
     # additive effect on the probabilities
@@ -137,10 +134,7 @@ data_sim_block <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_a
       p[j1] = O1/(1+O1) + (ind_trend1)/10
       p[j2] = O2/(1+O2) + (ind_trend2)/10
       
-      # OR1 = (p1/(1-p1))/(p0/(1-p0))
-      # OR2 = 
-      (OR_inf1 = (p[j2][1]/(1-p[j2][1]))/(p[j0][N1[1]]/(1-p[j0][N1[1]])))
-      (OR_inf2 = (p[j2][1]/(1-p[j2][1]))/(p[j0][N1[1]+1]/(1-p[j0][N1[1]+1])))
+      OR_inf2 <- (p[j2][1]/(1-p[j2][1]))/(p[j0][N1[1]+1]/(1-p[j0][N1[1]+1])) # time dependent OR2
     }
     
     if(sum(p<0 | p>1)>0){ # check if all probabilities are between 0 and 1
@@ -165,8 +159,6 @@ data_sim_block <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_a
   return(Data)
 }
 
-
-#test <- data_sim(K=1, mu0=0, delta=c(0.25,0.25), p0, OR, lambda=c(0,0,0), sigma=1, N1=c(250,250), N2=c(250,250), N_add=250, N_peak, trend="stepwise", trend_param, endpoint="continuous")
-
+######################################################################################################################################
 
 

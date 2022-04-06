@@ -1,3 +1,4 @@
+#######################################################################################################################################
 
 # Logistic model M_a1 (ALLTC-Linear) - using all data to estimate effects of all treatments + effect of continuous recruitment
 
@@ -42,7 +43,7 @@ logistic_model_a2 <- function(data, OR, alpha=0.025){
 # Logistic model M_b1 (TC-Linear) - using only control data (both stages) and newly added arm to estimate the effect of new treatment only + effect of continuous recruitment
 
 logistic_model_b1 <- function(data, OR, alpha=0.025){
-  #data <- data %>% filter(treatment %in% c(0, max(treatment)))
+  
   data <- data[data$treatment %in% c(0, 2),]
   
   # fit logistic model
@@ -64,7 +65,7 @@ logistic_model_b1 <- function(data, OR, alpha=0.025){
 # Logistic model M_b2 (TC-Step) - using only control data (both stages) and newly added arm to estimate the effect of new treatment only + stage effect
 
 logistic_model_b2 <- function(data, OR, alpha=0.025){
-  #data <- data %>% filter(treatment %in% c(0, max(treatment)))
+  
   data <- data[data$treatment %in% c(0, 2),]
   
   # fit logistic model
@@ -128,11 +129,10 @@ logistic_model_a2_int <- function(data, OR, alpha=0.025){
 
 ######################################################################################################################################
 
-
 # Logistic model sepatate
 
 logistic_model_sep <- function(data, OR, alpha=0.025){
-  #data <- data %>% filter(treatment %in% c(0, max(treatment)), stage==2)
+  
   data <- data[data$treatment %in% c(0, 2) & data$stage==2,]
   
   # fit logistic model
@@ -151,11 +151,10 @@ logistic_model_sep <- function(data, OR, alpha=0.025){
 
 ######################################################################################################################################
 
-
 # Logistic model pooled
 
 logistic_model_pol <- function(data, OR, alpha=0.025){
-  #data <- data %>% filter(treatment %in% c(0, max(treatment)))
+  
   data <- data[data$treatment %in% c(0, 2),]
   
   # fit logistic model
@@ -171,3 +170,5 @@ logistic_model_pol <- function(data, OR, alpha=0.025){
   
   return(list(p_val=p_val_treat, bias=bias, reject_h02=reject_h02))
 }
+
+#######################################################################################################################################

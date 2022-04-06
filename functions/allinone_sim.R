@@ -1,4 +1,5 @@
-# 
+######################################################################################################################################
+
 allinone_simsce <- function(nsim, scenarios, endpoint, alpha=0.025){
   
   if(endpoint=="continuous"){ 
@@ -19,7 +20,6 @@ allinone_simsce <- function(nsim, scenarios, endpoint, alpha=0.025){
                           bias_zsep=c(0), bias_zpol=c(0))
     
     for(i in 1:dim(scenarios)[1]){
-      #set.seed(1) # for testing the parallel version
       res <- replicate(nsim, allinone_model(data=data_sim_block(K=scenarios$K[i], mu0=scenarios$mu0[i],
                                                                 delta=c(scenarios$delta1[i], scenarios$delta2[i]),
                                                                 lambda=c(scenarios$lambda0[i], scenarios$lambda1[i], scenarios$lambda2[i]),
@@ -61,7 +61,6 @@ allinone_simsce <- function(nsim, scenarios, endpoint, alpha=0.025){
                           bias_log_sep=c(0), bias_log_pol=c(0))
     
     for(i in 1:dim(scenarios)[1]){
-      #set.seed(1) # for testing the parallel version
       res <- replicate(nsim, allinone_model(data=db<-data_sim_block(K=scenarios$K[i], p0=scenarios$p0[i],
                                                                     OR=c(scenarios$OR1[i], scenarios$OR2[i]),
                                                                     lambda=c(scenarios$lambda0[i],
@@ -90,6 +89,6 @@ allinone_simsce <- function(nsim, scenarios, endpoint, alpha=0.025){
   
 }
 
-
+######################################################################################################################################
 
 

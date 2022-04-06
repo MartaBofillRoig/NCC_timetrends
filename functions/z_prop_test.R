@@ -1,3 +1,5 @@
+#######################################################################################################################################
+
 # Pooled two-proportions z-test
 
 z_prop_pol <- function(data, OR, alpha=0.025){
@@ -24,6 +26,8 @@ z_prop_pol <- function(data, OR, alpha=0.025){
   
   return(list(z_stat=z_stat, bias=bias, reject_h02=reject_h02, p_val=pvalue))
 }
+
+#######################################################################################################################################
 
 # Separate two-proportions z-test
 
@@ -52,4 +56,4 @@ z_prop_sep <- function(data, OR, alpha=0.025){
   return(list(z_stat=z_stat, bias=bias, reject_h02=reject_h02, p_val=pvalue))
 }
 
-
+#######################################################################################################################################

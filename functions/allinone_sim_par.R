@@ -1,4 +1,5 @@
-# 
+######################################################################################################################################
+
 allinone_simsce_par <- function(nsim, scenarios, endpoint, alpha=0.025){
   
   cores=detectCores()
@@ -22,9 +23,8 @@ allinone_simsce_par <- function(nsim, scenarios, endpoint, alpha=0.025){
                           bias_tsep=c(0), bias_tpol=c(0),
                           bias_zsep=c(0), bias_zpol=c(0))
     
-    results <- foreach(i = 1:dim(scenarios)[1], .combine="rbind", #.packages=c("tidyverse"),
+    results <- foreach(i = 1:dim(scenarios)[1], .combine="rbind",
                        .export = c("allinone_model", "data_sim_block", "linear_model_a1", "linear_model_a2", "linear_model_a1_int", "linear_model_a2_int", "linear_model_b1", "linear_model_b2", "t_test_pol", "t_test_sep", "z_test_pol", "z_test_sep", "linear_trend", "sw_trend")) %dopar% {
-                         #set.seed(1) # for testing the parallel version
                          res <- replicate(nsim, allinone_model(data=data_sim_block(K=scenarios$K[i],mu0=scenarios$mu0[i],
                                                                                    delta=c(scenarios$delta1[i],scenarios$delta2[i]),
                                                                                    lambda=c(scenarios$lambda0[i],scenarios$lambda1[i],scenarios$lambda2[i]),
@@ -45,7 +45,6 @@ allinone_simsce_par <- function(nsim, scenarios, endpoint, alpha=0.025){
                          bias <- colMeans(do.call(rbind,db$bias))
                          results[i,] <- c(prob_rej, rMSE, bias)
                          results[i,]
-                         #rm(res)
                        }
     
     parallel::stopCluster(cl)
@@ -70,9 +69,8 @@ allinone_simsce_par <- function(nsim, scenarios, endpoint, alpha=0.025){
                           bias_zsep=c(0), bias_zpol=c(0),
                           bias_log_sep=c(0), bias_log_pol=c(0))
     
-    results <- foreach(i = 1:dim(scenarios)[1], .combine="rbind", #.packages=c("tidyverse"),
+    results <- foreach(i = 1:dim(scenarios)[1], .combine="rbind",
                        .export = c("allinone_model", "data_sim_block", "logistic_model_a1", "logistic_model_a2", "logistic_model_a1_int", "logistic_model_a2_int", "logistic_model_b1", "logistic_model_b2", "z_prop_sep", "z_prop_pol", "logistic_model_sep", "logistic_model_pol", "linear_trend", "sw_trend")) %dopar% {
-                         #set.seed(1) # for testing the parallel version
                          res <- replicate(nsim, allinone_model(data=db<-data_sim_block(K=scenarios$K[i], p0=scenarios$p0[i],
                                                                                        OR=c(scenarios$OR1[i], scenarios$OR2[i]),
                                                                                        lambda=c(scenarios$lambda0[i],
@@ -96,18 +94,15 @@ allinone_simsce_par <- function(nsim, scenarios, endpoint, alpha=0.025){
                          bias <- colMeans(do.call(rbind,db$bias))
                          results[i,] <- c(prob_rej, rMSE, bias)
                          results[i,]
-                         #rm(res)
                        }
     
     parallel::stopCluster(cl)
     gc()
     return(cbind(scenarios,results))
   }
-  
-  #doParallel::stopImplicitCluster()
 }
 
-
+######################################################################################################################################
 
 
 

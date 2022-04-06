@@ -1,4 +1,5 @@
-#
+#######################################################################################################################################
+
 data_sim <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_add, trend, trend_param, endpoint){
   N1<-round(N1)
   N2<-round(N2)
@@ -57,7 +58,7 @@ data_sim <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_add, tr
     X <- rnorm(n=sum(N+N_add), mean=mu0+means, sd=sigma)
   }
   
-  # Simulation of binary endpoint (with different possible parametrization of the time trend)
+  # Simulation of binary endpoint (with different possible parametrizations of the time trend)
   
   if(endpoint=="binary"){
     
@@ -99,7 +100,7 @@ data_sim <- function(K=1, mu0=0, delta, p0, OR, lambda, sigma, N1, N2, N_add, tr
 }
 
 
-#test <- data_sim(K=1, p0=0.2, OR=c(0.8, 0.7), lambda=c(0, 0, 0), N1=c(1370,4130), N2=c(1370,4130), N_add=5500, endpoint="binary", trend="linear", trend_param="add")
+#######################################################################################################################################
 
 
 
