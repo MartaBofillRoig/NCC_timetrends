@@ -8,7 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-This repository contains the main code and R functions to reproduce the results of the simulation study in **"On model-based time trend adjustments in platform trials with non-concurrent controls"** (https://arxiv.org/abs/2112.06574).
+This repository contains the main code and R functions to reproduce the results of the simulation study in **"On model-based time trend adjustments in platform trials with non-concurrent controls"** [[Paper](https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-022-01683-w)] [[Preprint](https://arxiv.org/abs/2112.06574)].
 
 We investigated frequentist, model-based approaches to adjust for time trends in platform trials utilizing non-concurrent controls. We investigated conditions under which the model-based approaches can successfully adjust for time trends in the simple case of a two-period trial with two experimental treatments and a shared control. Assuming that the second treatment arm is added at a later time period, we assess the robustness of recently proposed model-based approaches to adjust for time trends when utilizing non-concurrent controls. The following figure illustrates the design considered:
 
@@ -47,7 +47,7 @@ The folder _functions_ contains all R functions necessary to reproduce the resul
 
 ## Functions for simulations
 
-- **allinone_model.R**: The function ``allinone_model()`` is programmed to call all the aforementioned functions and return the calculated metrics (T/F for reject $H_{02}$ and bias) from all considered tests and models.
+- **allinone_model.R**: The function ``allinone_model()`` is programmed to call all the aforementioned functions and return the calculated metrics (T/F for reject H02 and bias) from all considered tests and models.
 
 - **allinone_sim.R**: The function ``allinone_simsce()`` takes a data frame with different simulation scenarios as input and performs _nsim_ replications for each of them to simulate the type I error rate/power, bias and rMSE.
 
