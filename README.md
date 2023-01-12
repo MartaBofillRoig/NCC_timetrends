@@ -5,7 +5,8 @@ non-concurrent controls
 This repository contains the main code and R functions to reproduce the
 results of the simulation study in **“On model-based time trend
 adjustments in platform trials with non-concurrent controls”**
-(<https://arxiv.org/abs/2112.06574>).
+\[[Paper](https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-022-01683-w)\]
+\[[Preprint](https://arxiv.org/abs/2112.06574)\].
 
 We investigated frequentist, model-based approaches to adjust for time
 trends in platform trials utilizing non-concurrent controls. We
@@ -89,9 +90,8 @@ the results and figures in the main paper and supplementary material:
 
 -   **allinone_model.R**: The function `allinone_model()` is programmed
     to call all the aforementioned functions and return the calculated
-    metrics (T/F for reject
-    ![H\_{02}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;H_%7B02%7D "H_{02}")
-    and bias) from all considered tests and models.
+    metrics (T/F for reject H02 and bias) from all considered tests and
+    models.
 
 -   **allinone_sim.R**: The function `allinone_simsce()` takes a data
     frame with different simulation scenarios as input and performs
